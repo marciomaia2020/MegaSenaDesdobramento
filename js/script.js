@@ -58,8 +58,8 @@ function gerarJogos() {
     const dezenasAdicionais = Number(document.getElementById('dezenas-adicionais').value.trim());
     
     // Valida a quantidade de jogos e o número fixo
-    if (quantidadeJogos <= 0 || quantidadeJogos > 100) {
-        alert("A quantidade de jogos deve ser entre 1 e 100.");
+    if (quantidadeJogos <= 0 || quantidadeJogos > 1000) {
+        alert("A quantidade de jogos deve ser entre 1 e 1000.");
         return;
     }
     

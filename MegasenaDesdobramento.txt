@@ -10,7 +10,7 @@
 <body>
     <div class="container">
         <h1>Desdobramento Mega-Sena</h1>
-        <h3>Números disponíveis (Desdobramento para 30 dezenas)</h3>
+        <h3>Números disponíveis (Desdobramento para 60 dezenas)</h3>
         <div class="table-container">
             <table id="numeros">
                 <tr>
@@ -25,16 +25,18 @@
                 <li>Escolha <strong>uma dezena</strong> para fixar.</li>
                 <li>Selecione a <strong>quantidade de jogos</strong> que deseja gerar.</li>
                 <li>Escolha de 7 a 20 dezenas adicionais (<span style="color: red;">opcional</span>).</li>
-                <li>Salve o jogo para abrir no Bloco de Notas ou exporte para o xcel.</li>
+                <li>Salve o jogo para abrir no Bloco de Notas ou exporte para o Excel.</li>
             </ol>
         </div>
         <div class="number-selection">
             <label for="excluir-pares">Dezenas pares a excluir:</label>
-            <input type="text" id="excluir-pares" placeholder="Ex: 02, 04, 10, ...">
+            <input type="text" id="excluir-pares" placeholder="Digite dezenas Pares separadas por vírgula">
+            <div id="erro-pares" class="erro"></div>
         </div>
         <div class="number-selection">
             <label for="excluir-impares">Dezenas ímpares a excluir:</label>
-            <input type="text" id="excluir-impares" placeholder="Ex: 01, 03, 11, ...">
+            <input type="text" id="excluir-impares" placeholder="Digite dezenas Ímpares separadas por vírgula">
+            <div id="erro-impares" class="erro"></div>
         </div>
         <div class="number-selection">
             <label for="fixar">Dezena a fixar:</label>
@@ -45,7 +47,7 @@
             <input type="number" id="jogos" min="1" max="100" placeholder="Ex: 5">
         </div>
         <div class="number-selection">
-            <label for="dezenas-adicionais">Dezenas adicionais (7 a 20): (<span style="color: red;">opcional</span>)</label>
+            <label for="dezenas-adicionais">Dezenas adicionais: (<span style="color: red;">opcional</span>)</label>
             <input type="number" id="dezenas-adicionais" min="7" max="20" placeholder="Ex: 10">
         </div>
         <div class="button-container">
@@ -74,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const td = document.createElement('td');
         td.textContent = i.toString().padStart(2, '0');
         td.style.fontFamily = 'Arial, sans-serif';
-        td.style.fontSize = '14px';
+        td.style.fontSize = '19px';
         td.style.padding = '5px';
         td.style.border = '1px solid #ccc';
         td.style.textAlign = 'center';
@@ -83,405 +85,161 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+function validarNumeros(numArray, tipo) {
+    // Valida a quantidade e o tipo dos números
+    const numCount = numArray.length;
+    const tipoCorreto = tipo === 'pares' ? numArray.every(num => num % 2 === 0) : numArray.every(num => num % 2 !== 0);
+    
+    if (numCount !== 10) {
+        return `Você deve inserir exatamente 10 números ${tipo}.`;
+    } else if (!tipoCorreto) {
+        return `Todos os números no campo ${tipo} devem ser ${tipo}.`;
+    } else {
+        return null;
+    }
+}
+
+function validarCampo(inputId, tipo) {
+    const input = document.getElementById(inputId);
+    const erroElemento = document.getElementById(`erro-${tipo}`);
+    
+    const numeros = input.value.split(',').map(num => Number(num.trim())).filter(num => !isNaN(num));
+    const mensagemErro = validarNumeros(numeros, tipo);
+    
+    if (mensagemErro) {
+        erroElemento.textContent = mensagemErro;
+    } else {
+        erroElemento.textContent = '';
+    }
+    
+    // Atualiza a lista de números de pares ou ímpares
+    return numeros;
+}
+
+document.getElementById('excluir-pares').addEventListener('input', () => validarCampo('excluir-pares', 'pares'));
+document.getElementById('excluir-impares').addEventListener('input', () => validarCampo('excluir-impares', 'impares'));
+
 function gerarJogos() {
-    const excluirPares = document.getElementById('excluir-pares').value.split(',').map(num => Number(num.trim())).filter(num => !isNaN(num) && num % 2 === 0);
-    const excluirImpares = document.getElementById('excluir-impares').value.split(',').map(num => Number(num.trim())).filter(num => !isNaN(num) && num % 2 !== 0);
+    const excluirPares = validarCampo('excluir-pares', 'pares');
+    const excluirImpares = validarCampo('excluir-impares', 'impares');
+    
     const fixar = Number(document.getElementById('fixar').value.trim());
-    const dezenasAdicionais = Number(document.getElementById('dezenas-adicionais').value.trim());
     const quantidadeJogos = Number(document.getElementById('jogos').value.trim());
-    const jogosGeradosDiv = document.getElementById('jogosGerados');
-    jogosGeradosDiv.innerHTML = ''; // Limpa jogos anteriores
-
-    // Validação básica
-    if (excluirPares.length !== 10 || excluirImpares.length !== 10 || isNaN(fixar) || isNaN(quantidadeJogos) || !Number.isInteger(quantidadeJogos) || dezenasAdicionais < 7 || dezenasAdicionais > 20) {
-        alert('Por favor, insira as dezenas corretamente e selecione uma quantidade de jogos válida.');
+    const dezenasAdicionais = Number(document.getElementById('dezenas-adicionais').value.trim());
+    
+    // Valida a quantidade de jogos e o número fixo
+    if (quantidadeJogos <= 0 || quantidadeJogos > 1000) {
+        alert("A quantidade de jogos deve ser entre 1 e 1000.");
         return;
     }
-
-    // Verifica se a dezena fixada está entre as dezenas excluídas
-    if (excluirPares.includes(fixar) || excluirImpares.includes(fixar)) {
-        alert('A dezena a ser fixada não pode estar entre as dezenas excluídas. Por favor, escolha outra.');
+    
+    if (isNaN(fixar) || fixar < 1 || fixar > 60) {
+        alert("A dezena fixa deve estar entre 1 e 60.");
         return;
     }
-
-    // Números disponíveis excluindo os selecionados pelo usuário
-    let numeros = [];
-    for (let i = 1; i <= 60; i++) {
-        if (!excluirPares.includes(i) && !excluirImpares.includes(i)) {
-            numeros.push(i);
-        }
-    }
-
-    // Remove a dezena fixada dos números restantes
-    numeros = numeros.filter(num => num !== fixar);
-
-    if (numeros.length < (5 + dezenasAdicionais)) {
-        alert('Não há números suficientes disponíveis para gerar jogos.');
+    
+    const numerosDisponiveis = Array.from({ length: 60 }, (_, i) => i + 1)
+        .filter(num => !excluirPares.includes(num) && !excluirImpares.includes(num));
+    
+    if (numerosDisponiveis.length < 6) {
+        alert("Não há números suficientes para gerar jogos.");
         return;
     }
-
-    // Define o limite máximo de jogos para evitar problemas de desempenho
-    const limiteMaximoJogos = 1000;
-
-    if (quantidadeJogos > limiteMaximoJogos) {
-        alert(`A quantidade máxima de jogos é ${limiteMaximoJogos}. Por favor, ajuste a quantidade de jogos.`);
-        return;
-    }
-
-    // Função para calcular o tamanho da fonte com base no número de jogos
-    function getFontSize(numJogos) {
-        if (numJogos <= 6) {
-            return '16px'; // Tamanho padrão para até 6 jogos
-        } else if (numJogos <= 20) {
-            return '14px'; // Reduz um pouco o tamanho para até 20 jogos
-        } else {
-            return '12px'; // Reduz ainda mais para mais de 20 jogos
-        }
-    }
-
-    // Calcula o tamanho da fonte com base no número de jogos
-    const fontSize = getFontSize(quantidadeJogos);
-
-    // Conjunto para verificar duplicidade
-    const jogosUnicos = new Set();
-
+    
+    const jogos = [];
+    
     for (let j = 0; j < quantidadeJogos; j++) {
-        let jogo = [fixar]; // Começa com a dezena fixada
-        let numerosRestantes = [...numeros];
-
-        // Seleciona as dezenas adicionais (opcional)
-        let adicionaisSelecionados = [];
-        for (let i = 0; i < dezenasAdicionais; i++) {
-            const randomIndex = Math.floor(Math.random() * numerosRestantes.length);
-            adicionaisSelecionados.push(numerosRestantes.splice(randomIndex, 1)[0]);
+        let numerosAleatorios = [...numerosDisponiveis];
+        
+        if (dezenasAdicionais > 0) {
+            // Adiciona dezenas adicionais, garantindo que sejam únicas
+            const adicionais = Array.from({ length: dezenasAdicionais }, () => {
+                let numero;
+                do {
+                    numero = Math.floor(Math.random() * 60) + 1;
+                } while (numerosDisponiveis.includes(numero) || numerosAleatorios.includes(numero));
+                return numero;
+            });
+            numerosAleatorios = numerosAleatorios.concat(adicionais);
         }
-
-        // Preenche com números restantes até ter a quantidade correta de dezenas
-        while (jogo.length < 6 + dezenasAdicionais) {
-            const randomIndex = Math.floor(Math.random() * numerosRestantes.length);
-            jogo.push(numerosRestantes.splice(randomIndex, 1)[0]);
+        
+        // Garante que o total de dezenas para o jogo seja o especificado pelo usuário
+        let totalDezenas = [...new Set(numerosAleatorios)].sort(() => 0.5 - Math.random()).slice(0, 6);
+        
+        // Adiciona a dezena fixa se não estiver presente
+        if (!totalDezenas.includes(fixar)) {
+            totalDezenas[Math.floor(Math.random() * totalDezenas.length)] = fixar;
         }
-
-        // Ordena as dezenas em ordem crescente
-        jogo.sort((a, b) => a - b);
-
-        // Verifica se o jogo já foi gerado
-        const jogoStr = jogo.join(',');
-        if (jogosUnicos.has(jogoStr)) {
-            j--; // Tenta novamente
-            continue;
-        }
-
-        // Adiciona o jogo ao conjunto de jogos únicos
-        jogosUnicos.add(jogoStr);
-
-        // Cria o elemento para exibir o jogo gerado
+        
+        // Ordena os números e ajusta para incluir a dezena fixa e as dezenas adicionais
+        totalDezenas = totalDezenas.sort((a, b) => a - b); 
+        
+        // Formatação dos jogos
         const jogoElement = document.createElement('p');
-        jogoElement.textContent = jogo.join(', ');
-        jogoElement.style.fontSize = fontSize; // Define o tamanho da fonte
-        jogoElement.style.fontFamily = 'Arial, sans-serif';
-        jogoElement.style.color = '#333';
-        jogosGeradosDiv.appendChild(jogoElement);
+        jogoElement.innerHTML = `J${j + 1}- ${totalDezenas.map(num => {
+            if (num === fixar) {
+                // Destaca a dezena fixada com uma cor diferente
+                return `<span style="color: red; font-weight: bold; font-family: Arial, sans-serif;">${num.toString().padStart(2, '0')}</span>`;
+            } else {
+                return `<span style="font-family: Courier New, monospace;">${num.toString().padStart(2, '0')}</span>`;
+            }
+        }).join(', ')}`;
+        jogoElement.style.border = '1px solid #dcdcdc'; // Tom de cinza claro para a borda
+        jogoElement.style.padding = '10px';
+        jogoElement.style.margin = '5px 0';
+        jogoElement.style.textAlign = 'center'; // Centraliza o texto
+        jogoElement.style.backgroundColor = '#f5f5f5'; // Tom de cinza claro para o fundo
+        jogoElement.style.color = '#333'; // Tom de cinza escuro para o texto
+        jogoElement.style.fontSize = '16px'; // Ajusta o tamanho da fonte
+        jogoElement.style.borderRadius = '4px'; // Bordas arredondadas
+        
+        jogos.push(jogoElement);
     }
+    
+    const jogosGerados = document.getElementById('jogosGerados');
+    jogosGerados.innerHTML = '';
+    jogos.forEach(jogoElement => jogosGerados.appendChild(jogoElement));
 }
 
 function salvarJogo() {
-    const jogosGeradosDiv = document.getElementById('jogosGerados');
-    const jogos = jogosGeradosDiv.innerText.trim();
-
-    if (!jogos) {
-        alert('Nenhum jogo gerado para salvar.');
+    let jogos = document.getElementById('jogosGerados').innerText.trim();
+    
+    if (jogos === '') {
+        alert("Nenhum jogo foi gerado.");
         return;
     }
+    
+    // Remove a letra 'J', os hífens e as vírgulas
+    jogos = jogos.replace(/J\d+-\s*/g, ''); // Remove a letra 'J' e o número seguido de hífen
+    jogos = jogos.replace(/,/g, ''); // Remove apenas as vírgulas, mantendo os espaços
 
-    const blob = new Blob([jogos], { type: 'text/plain;charset=utf-8' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'jogos_megasena.txt';
-    link.click();
+    const blob = new Blob([jogos], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'jogos_megasena.txt';
+    a.click();
+    
+    URL.revokeObjectURL(url);
 }
 
-function resetarJogo() {
-    document.getElementById('excluir-pares').value = '';
-    document.getElementById('excluir-impares').value = '';
-    document.getElementById('fixar').value = '';
-    document.getElementById('jogos').value = '';
-    document.getElementById('dezenas-adicionais').value = '';
-    document.getElementById('jogosGerados').innerHTML = '';
-}
+
 
 function exportarParaExcel() {
-    const jogosGeradosDiv = document.getElementById('jogosGerados');
-    const jogos = jogosGeradosDiv.innerText.trim();
-
-    if (!jogos) {
-        alert('Nenhum jogo gerado para exportar.');
+    const jogos = document.getElementById('jogosGerados').innerText.trim();
+    
+    if (jogos === '') {
+        alert("Nenhum jogo foi gerado.");
         return;
     }
-
-    const linhas = jogos.split('\n').map(linha => linha.split(', '));
-    const ws = XLSX.utils.aoa_to_sheet(linhas);
+    
     const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(jogos.split('\n').map(jogo => [jogo]));
     XLSX.utils.book_append_sheet(wb, ws, 'Jogos');
+    
     XLSX.writeFile(wb, 'jogos_megasena.xlsx');
 }
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desdobramento Mega-Sena</title>
-    <link rel="stylesheet" href="./css/styles.css"> <!-- Corrija o caminho do CSS se necessário -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-</head>
-<body>
-    <div class="container">
-        <h1>Desdobramento Mega-Sena</h1>
-        <h3>Números disponíveis (Desdobramento para 60 dezenas)</h3>
-        <div class="table-container">
-            <table id="numeros">
-                <tr>
-                    <!-- Os números serão inseridos aqui via JavaScript -->
-                </tr>
-            </table>
-        </div>
-        <div class="instructions">
-            <p><strong>INSTRUÇÕES:</strong></p>
-            <ol>
-                <li>Exclua exatamente <strong>10 dezenas pares</strong> e <strong>10 dezenas ímpares</strong>.</li>
-                <li>Escolha <strong>uma dezena</strong> para fixar.</li>
-                <li>Selecione a <strong>quantidade de jogos</strong> que deseja gerar.</li>
-                <li>Escolha de 7 a 20 dezenas adicionais (<span style="color: red;">opcional</span>).</li>
-                <li>Salve o jogo (como *.txt) ou Exporte para o excel.</li>
-            </ol>
-        </div>
-        <div class="number-selection">
-            <label for="excluir-pares">Dezenas pares a excluir:</label>
-            <input type="text" id="excluir-pares" placeholder="Ex: 02, 04, 10, ...">
-        </div>
-        <div class="number-selection">
-            <label for="excluir-impares">Dezenas ímpares a excluir:</label>
-            <input type="text" id="excluir-impares" placeholder="Ex: 01, 03, 11, ...">
-        </div>
-        <div class="number-selection">
-            <label for="fixar">Dezena a fixar:</label>
-            <input type="text" id="fixar" placeholder="Ex: 07">
-        </div>
-        <div class="number-selection">
-            <label for="jogos">Quantidade de jogos:</label>
-            <input type="number" id="jogos" min="1" max="100" placeholder="Ex: 5">
-        </div>
-        <div class="number-selection">
-            <label for="dezenas-adicionais">Dezenas adicionais (7 a 20): (<span style="color: red;">opcional</span>)</label>
-            <input type="number" id="dezenas-adicionais" min="7" max="20" placeholder="Ex: 10">
-        </div>
-        <div class="button-container">
-            <button onclick="gerarJogos()">Gerar Jogos</button>
-            <button onclick="salvarJogo()">Salvar Jogo</button>
-            <button onclick="resetarJogo()">Resetar Jogo</button>
-            <button onclick="exportarParaExcel()">Exportar para Excel</button>
-        </div>
-        <div class="userInformation">
-            <p>Os jogos serão gerados com no mínimo 6 dezenas. Caso não haja adição de dezenas (<span style="color: red;">opcional</span>).</p>
-            <p>Os jogos gerados são checados automaticamente afim de não haver duplicidade.</p>
-            <p>O limite para a geração de jogos está setada para 1000.</p>
-        </div>
-        <div id="jogosGerados">
-            <!-- Os jogos gerados serão inseridos aqui via JavaScript -->
-        </div>
-    </div>
-    <script src="./js/script.js"></script> <!-- Corrija o caminho do JavaScript se necessário -->
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desdobramento Mega-Sena</title>
-    <link rel="stylesheet" href="./css/styles.css"> <!-- Corrija o caminho do CSS se necessário -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-</head>
-<body>
-    <div class="container">
-        <h1>Desdobramento Mega-Sena</h1>
-        <h3>Números disponíveis (Desdobramento para 60 dezenas)</h3>
-        <div class="table-container">
-            <table id="numeros">
-                <tr>
-                    <!-- Os números serão inseridos aqui via JavaScript -->
-                </tr>
-            </table>
-        </div>
-        <div class="instructions">
-            <p><strong>INSTRUÇÕES:</strong></p>
-            <ol>
-                <li>Exclua exatamente <strong>10 dezenas pares</strong> e <strong>10 dezenas ímpares</strong>.</li>
-                <li>Escolha <strong>uma dezena</strong> para fixar.</li>
-                <li>Selecione a <strong>quantidade de jogos</strong> que deseja gerar.</li>
-                <li>Escolha de 7 a 20 dezenas adicionais (<span style="color: red;">opcional</span>).</li>
-                <li>Salve o jogo (como *.txt) ou Exporte para o excel.</li>
-            </ol>
-        </div>
-        <div class="number-selection">
-            <label for="excluir-pares">Dezenas pares a excluir:</label>
-            <input type="text" id="excluir-pares" placeholder="Ex: 02, 04, 10, ...">
-        </div>
-        <div class="number-selection">
-            <label for="excluir-impares">Dezenas ímpares a excluir:</label>
-            <input type="text" id="excluir-impares" placeholder="Ex: 01, 03, 11, ...">
-        </div>
-        <div class="number-selection">
-            <label for="fixar">Dezena a fixar:</label>
-            <input type="text" id="fixar" placeholder="Ex: 07">
-        </div>
-        <div class="number-selection">
-            <label for="jogos">Quantidade de jogos:</label>
-            <input type="number" id="jogos" min="1" max="100" placeholder="Ex: 5">
-        </div>
-        <div class="number-selection">
-            <label for="dezenas-adicionais">Dezenas adicionais (7 a 20): (<span style="color: red;">opcional</span>)</label>
-            <input type="number" id="dezenas-adicionais" min="7" max="20" placeholder="Ex: 10">
-        </div>
-        <div class="button-container">
-            <button onclick="gerarJogos()">Gerar Jogos</button>
-            <button onclick="salvarJogo()">Salvar Jogo</button>
-            <button onclick="resetarJogo()">Resetar Jogo</button>
-            <button onclick="exportarParaExcel()">Exportar para Excel</button>
-        </div>
-        <div class="userInformation">
-            <p>Os jogos serão gerados com no mínimo 6 dezenas. Caso não haja adição de dezenas (<span style="color: red;">opcional</span>).</p>
-            <p>Os jogos gerados são checados automaticamente afim de não haver duplicidade.</p>
-            <p>O limite para a geração de jogos está setada para 1000.</p>
-        </div>
-        <div id="jogosGerados">
-            <!-- Os jogos gerados serão inseridos aqui via JavaScript -->
-        </div>
-    </div>
-    <script src="./js/script.js"></script> <!-- Corrija o caminho do JavaScript se necessário -->
-</body>
-</html>
-document.addEventListener("DOMContentLoaded", () => {
-    const numerosTable = document.getElementById('numeros').getElementsByTagName('tr')[0];
-    
-    // Preenche a tabela com números de 01 a 60
-    for (let i = 1; i <= 60; i++) {
-        const td = document.createElement('td');
-        td.textContent = i.toString().padStart(2, '0');
-        td.style.fontFamily = 'Arial, sans-serif';
-        td.style.fontSize = '14px';
-        td.style.padding = '5px';
-        td.style.border = '1px solid #ccc';
-        td.style.textAlign = 'center';
-        td.style.color = '#333';
-        numerosTable.appendChild(td);
-    }
-});
-
-function gerarJogos() {
-    const excluirPares = document.getElementById('excluir-pares').value.split(',').map(num => Number(num.trim())).filter(num => !isNaN(num) && num % 2 === 0);
-    const excluirImpares = document.getElementById('excluir-impares').value.split(',').map(num => Number(num.trim())).filter(num => !isNaN(num) && num % 2 !== 0);
-    const fixar = Number(document.getElementById('fixar').value.trim());
-    const dezenasAdicionais = Number(document.getElementById('dezenas-adicionais').value.trim());
-    const quantidadeJogos = Number(document.getElementById('jogos').value.trim());
-    const jogosGeradosDiv = document.getElementById('jogosGerados');
-    jogosGeradosDiv.innerHTML = ''; // Limpa jogos anteriores
-
-    // Validação básica
-    if (excluirPares.length !== 10 || excluirImpares.length !== 10 || isNaN(fixar) || isNaN(quantidadeJogos) || !Number.isInteger(quantidadeJogos) || dezenasAdicionais < 7 || dezenasAdicionais > 20) {
-        alert('Por favor, insira as dezenas corretamente e selecione uma quantidade de jogos válida.');
-        return;
-    }
-
-    // Verifica se a dezena fixada está entre as dezenas excluídas
-    if (excluirPares.includes(fixar) || excluirImpares.includes(fixar)) {
-        alert('A dezena a ser fixada não pode estar entre as dezenas excluídas. Por favor, escolha outra.');
-        return;
-    }
-
-    // Números disponíveis excluindo os selecionados pelo usuário
-    let numeros = [];
-    for (let i = 1; i <= 60; i++) {
-        if (!excluirPares.includes(i) && !excluirImpares.includes(i)) {
-            numeros.push(i);
-        }
-    }
-
-    // Remove a dezena fixada dos números restantes
-    numeros = numeros.filter(num => num !== fixar);
-
-    if (numeros.length < (5 + dezenasAdicionais)) {
-        alert('Não há números suficientes disponíveis para gerar jogos.');
-        return;
-    }
-
-    // Define o limite máximo de jogos para evitar problemas de desempenho
-    const limiteMaximoJogos = 1000;
-
-    if (quantidadeJogos > limiteMaximoJogos) {
-        alert(`A quantidade máxima de jogos é ${limiteMaximoJogos}. Por favor, ajuste a quantidade de jogos.`);
-        return;
-    }
-
-    // Função para calcular o tamanho da fonte com base no número de jogos
-    function getFontSize(numJogos) {
-        if (numJogos <= 15) {
-            return '16px'; // Tamanho padrão para até 15 jogos
-        } else if (numJogos <= 20) {
-            return '14px'; // Reduz um pouco o tamanho para até 20 jogos
-        } else {
-            return '12px'; // Reduz ainda mais para mais de 20 jogos
-        }
-    }
-
-    // Calcula o tamanho da fonte com base no número de jogos
-    const fontSize = getFontSize(quantidadeJogos);
-
-    // Conjunto para verificar duplicidade
-    const jogosUnicos = new Set();
-
-    for (let j = 0; j < quantidadeJogos; j++) {
-        let jogo = [fixar]; // Começa com a dezena fixada
-        let numerosRestantes = [...numeros];
-
-        // Seleciona as dezenas adicionais (opcional)
-        let adicionaisSelecionados = [];
-        for (let i = 0; i < dezenasAdicionais; i++) {
-            const randomIndex = Math.floor(Math.random() * numerosRestantes.length);
-            adicionaisSelecionados.push(numerosRestantes.splice(randomIndex, 1)[0]);
-        }
-
-        // Preenche com números restantes até ter a quantidade correta de dezenas
-        while (jogo.length < 6 + dezenasAdicionais) {
-            const randomIndex = Math.floor(Math.random() * numerosRestantes.length);
-            jogo.push(numerosRestantes.splice(randomIndex, 1)[0]);
-        }
-
-        // Ordena as dezenas em ordem crescente
-        jogo.sort((a, b) => a - b);
-
-        // Verifica duplicidade
-        const jogoString = jogo.join(',');
-        if (!jogosUnicos.has(jogoString)) {
-            jogosUnicos.add(jogoString);
-            const p = document.createElement('p');
-            p.textContent = jogo.join(', ');
-            p.style.fontSize = fontSize; // Aplica o tamanho da fonte calculado
-            jogosGeradosDiv.appendChild(p);
-        } else {
-            j--; // Tenta gerar outro jogo se houver duplicidade
-        }
-    }
-}
-
-function salvarJogo() {
-    const jogos = document.getElementById('jogosGerados').innerText;
-    const blob = new Blob([jogos], { type: 'text/plain;charset=utf-8' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'jogos_mega_sena.txt';
-    link.click();
-}
 
 function resetarJogo() {
     document.getElementById('excluir-pares').value = '';
@@ -490,17 +248,9 @@ function resetarJogo() {
     document.getElementById('jogos').value = '';
     document.getElementById('dezenas-adicionais').value = '';
     document.getElementById('jogosGerados').innerHTML = '';
+    document.getElementById('erro-pares').textContent = '';
+    document.getElementById('erro-impares').textContent = '';
 }
-
-function exportarParaExcel() {
-    const jogos = Array.from(document.getElementById('jogosGerados').getElementsByTagName('p')).map(p => p.textContent);
-    const ws_data = jogos.map(jogo => jogo.split(', '));
-    const ws = XLSX.utils.aoa_to_sheet(ws_data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Jogos");
-    XLSX.writeFile(wb, "jogos_mega_sena.xlsx");
-}
-/* Arquivo CSS */
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f5f5f5;
@@ -604,4 +354,82 @@ button:hover {
     font-size: 14px;
     line-height: 1.6;
     word-wrap: break-word;
+    text-align: center;
+}
+
+.erro {
+    color: red;
+    font-size: 12px;
+}
+
+/* AJUSTES ESPECIAIS PARA NÃO TER PROBLEMA COM A VISUALIZAÇÃO*/
+
+/*1. Flexbox e Grid Layout
+Utilize o Flexbox ou o Grid Layout para garantir que os elementos se ajustem de forma flexível ao tamanho da tela.
+*/
+
+/* Utilize flexbox para a .container e os elementos internos */
+.container {
+    /*display: flex;*/
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Certifique-se de que a tabela também se ajuste corretamente */
+.table-container {
+    width: 100%;
+    overflow-x: auto; /* Permite rolagem horizontal se necessário */
+}
+
+/* Ajuste o tamanho dos botões e inputs para diferentes tamanhos de tela 
+button, input {
+    width: 100%;
+    max-width: -100px; /* Limite máximo de largura para botões e inputs 
+    margin: 1px 0; Adiciona um pequeno espaçamento 
+}*/
+
+/*
+2. Media Queries
+Utilize media queries para ajustar o estilo com base no tamanho da tela.*/
+/* Ajuste para telas menores */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .button-container {
+        flex-direction: column; /* Alinha os botões verticalmente */
+        align-items: center;
+    }
+
+    button {
+        width: 100%; /* Botões ocupam toda a largura disponível */
+        margin: 5px 0;
+    }
+
+    .number-selection input {
+        width: 100%; /* Inputs ocupam toda a largura disponível */
+        max-width: none; /* Remove o limite máximo de largura */
+    }
+}
+/*
+3. Overflow e Scroll
+Certifique-se de que elementos que podem exceder a largura da tela sejam roláveis.*/
+.table-container {
+    overflow-x: auto;
+}
+
+#jogosGerados {
+    word-wrap: break-word;
+    text-align: center;
+}
+/*
+4. Ajuste da Tabela
+Certifique-se de que a tabela se ajuste corretamente dentro do contêiner.*/
+
+#numeros {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto; /* Ajusta automaticamente a largura das colunas */
 }
