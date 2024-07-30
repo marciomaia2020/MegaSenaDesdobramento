@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desdobramento Mega-Sena</title>
+    <link rel="stylesheet" href="./css/styles.css"> <!-- Corrija o caminho do CSS se necessário -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Desdobramento Mega-Sena</h1>
+        <h3>Números disponíveis (Desdobramento para 60 dezenas)</h3>
+        <div class="table-container">
+            <table id="numeros">
+                <tr>
+                    <!-- Os números serão inseridos aqui via JavaScript -->
+                </tr>
+            </table>
+        </div>
+        <div class="instructions">
+            <p><strong>INSTRUÇÕES:</strong></p>
+            <ol>
+                <li>Exclua exatamente <strong>10 dezenas pares</strong> e <strong>10 dezenas ímpares</strong>.</li>
+                <li>Escolha <strong>uma dezena</strong> para fixar.</li>
+                <li>Selecione a <strong>quantidade de jogos</strong> que deseja gerar.</li>
+                <li>Escolha de 7 a 20 dezenas adicionais (<span style="color: red;">opcional</span>).</li>
+                <li>Salve o jogo (como *.txt) ou Exporte para o excel.</li>
+            </ol>
+        </div>
+        <div class="number-selection">
+            <label for="excluir-pares">Dezenas pares a excluir:</label>
+            <input type="text" id="excluir-pares" placeholder="Digite dezenas Pares separadas por vírgula">
+            <div id="erro-pares" class="erro"></div>
+        </div>
+        <div class="number-selection">
+            <label for="excluir-impares">Dezenas ímpares a excluir:</label>
+            <input type="text" id="excluir-impares" placeholder="Digite dezenas Ímpares separadas por vírgula">
+            <div id="erro-impares" class="erro"></div>
+        </div>
+        <div class="number-selection">
+            <label for="fixar">Dezena a fixar:</label>
+            <input type="text" id="fixar" placeholder="Ex: 07">
+        </div>
+        <div class="number-selection">
+            <label for="jogos">Quantidade de jogos:</label>
+            <input type="number" id="jogos" min="1" max="100" placeholder="Ex: 5">
+        </div>
+        <div class="number-selection">
+            <label for="dezenas-adicionais">Dezenas adicionais (7 a 20): (<span style="color: red;">opcional</span>)</label>
+            <input type="number" id="dezenas-adicionais" min="7" max="20" placeholder="Ex: 10">
+        </div>
+        <div class="button-container">
+            <button onclick="gerarJogos()">Gerar Jogos</button>
+            <button onclick="salvarJogo()">Salvar Jogo</button>
+            <button onclick="resetarJogo()">Resetar Jogo</button>
+            <button onclick="exportarParaExcel()">Exportar para Excel</button>
+        </div>
+        <div class="userInformation">
+            <p>Os jogos serão gerados com no mínimo 6 dezenas. Caso não haja adição de dezenas (<span style="color: red;">opcional</span>).</p>
+            <p>Os jogos gerados são checados automaticamente afim de não haver duplicidade.</p>
+            <p>O limite para a geração de jogos está setada para 1000.</p>
+        </div>
+        <div id="jogosGerados">
+            <!-- Os jogos gerados serão inseridos aqui via JavaScript -->
+        </div>
+    </div>
+    <script src="./js/script.js"></script> <!-- Corrija o caminho do JavaScript se necessário -->
+</body>
+</html>
