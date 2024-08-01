@@ -16,7 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function validarNumeros(numArray, tipo) {
-    // Valida a quantidade e o tipo dos números
     const numCount = numArray.length;
     const tipoCorreto = tipo === 'pares' ? numArray.every(num => num % 2 === 0) : numArray.every(num => num % 2 !== 0);
     
@@ -42,131 +41,180 @@ function validarCampo(inputId, tipo) {
         erroElemento.textContent = '';
     }
     
-    // Atualiza a lista de números de pares ou ímpares
     return numeros;
+}
+
+function validarFixar() {
+    const fixarInput = document.getElementById('fixar');
+    const erroFixar = document.getElementById('erro-fixar');
+    const fixar = Number(fixarInput.value.trim());
+    
+    if (isNaN(fixar) || fixar < 1 || fixar > 60) {
+        erroFixar.textContent = "A dezena fixa deve estar entre 1 e 60.";
+    } else {
+        erroFixar.textContent = '';
+    }
+}
+
+function validarJogos() {
+    const jogosInput = document.getElementById('jogos');
+    const erroJogos = document.getElementById('erro-jogos');
+    const jogos = Number(jogosInput.value.trim());
+    
+    if (jogos <= 0 || jogos > 1000) {
+        erroJogos.textContent = "A quantidade de jogos deve ser entre 1 e 1000.";
+    } else {
+        erroJogos.textContent = '';
+    }
 }
 
 document.getElementById('excluir-pares').addEventListener('input', () => validarCampo('excluir-pares', 'pares'));
 document.getElementById('excluir-impares').addEventListener('input', () => validarCampo('excluir-impares', 'impares'));
+document.getElementById('fixar').addEventListener('input', validarFixar);
+document.getElementById('jogos').addEventListener('input', validarJogos);
+
+
 
 function gerarJogos() {
-    const excluirPares = validarCampo('excluir-pares', 'pares');
-    const excluirImpares = validarCampo('excluir-impares', 'impares');
-    
-    const fixar = Number(document.getElementById('fixar').value.trim());
-    const quantidadeJogos = Number(document.getElementById('jogos').value.trim());
-    const dezenasAdicionais = Number(document.getElementById('dezenas-adicionais').value.trim());
-    
-    // Valida a quantidade de jogos e o número fixo
-    if (quantidadeJogos <= 0 || quantidadeJogos > 1000) {
-        alert("A quantidade de jogos deve ser entre 1 e 1000.");
-        return;
+    // Função para validar e obter valores dos campos
+    function obterValor(id) {
+        const valor = document.getElementById(id).value.trim();
+        const numero = Number(valor);
+        if (isNaN(numero) || numero <= 0 || numero > 60) {
+            alert(`O valor em ${id} deve ser um número entre 1 e 60.`);
+            throw new Error(`Valor inválido em ${id}`);
+        }
+        return numero;
     }
-    
-    if (isNaN(fixar) || fixar < 1 || fixar > 60) {
-        alert("A dezena fixa deve estar entre 1 e 60.");
-        return;
-    }
-    
-    const numerosDisponiveis = Array.from({ length: 60 }, (_, i) => i + 1)
-        .filter(num => !excluirPares.includes(num) && !excluirImpares.includes(num));
-    
-    if (numerosDisponiveis.length < 6) {
-        alert("Não há números suficientes para gerar jogos.");
-        return;
-    }
-    
-    const jogos = [];
-    
-    for (let j = 0; j < quantidadeJogos; j++) {
-        let numerosAleatorios = [...numerosDisponiveis];
-        
-        if (dezenasAdicionais > 0) {
-            // Adiciona dezenas adicionais, garantindo que sejam únicas
-            const adicionais = Array.from({ length: dezenasAdicionais }, () => {
-                let numero;
-                do {
-                    numero = Math.floor(Math.random() * 60) + 1;
-                } while (numerosDisponiveis.includes(numero) || numerosAleatorios.includes(numero));
-                return numero;
-            });
-            numerosAleatorios = numerosAleatorios.concat(adicionais);
+
+    // Obtém os valores dos campos e faz a validação
+    try {
+        const fixar = obterValor('fixar');
+        const quantidadeJogos = obterValor('jogos');
+        const dezenasAdicionais = Number(document.getElementById('dezenas-adicionais').value.trim());
+
+        if (quantidadeJogos <= 0 || quantidadeJogos > 1000) {
+            alert("Quantidade de jogos inválida. Deve ser entre 1 e 1000.");
+            return;
         }
         
-        // Garante que o total de dezenas para o jogo seja o especificado pelo usuário
-        let totalDezenas = [...new Set(numerosAleatorios)].sort(() => 0.5 - Math.random()).slice(0, 6);
-        
-        // Adiciona a dezena fixa se não estiver presente
-        if (!totalDezenas.includes(fixar)) {
-            totalDezenas[Math.floor(Math.random() * totalDezenas.length)] = fixar;
+        if (dezenasAdicionais < 0 || dezenasAdicionais > 5) {
+            alert("Número de dezenas adicionais deve ser entre 0 e 5.");
+            return;
         }
+
+        const excluirPares = (document.getElementById('excluir-pares').value.trim().split(',').map(Number) || []);
+        const excluirImpares = (document.getElementById('excluir-impares').value.trim().split(',').map(Number) || []);
         
-        // Ordena os números e ajusta para incluir a dezena fixa e as dezenas adicionais
-        totalDezenas = totalDezenas.sort((a, b) => a - b); 
+        // Verifica se os números fixos e adicionais estão dentro do intervalo
+        if (fixar < 1 || fixar > 60) {
+            alert("Número fixado inválido. Deve ser entre 1 e 60.");
+            return;
+        }
+
+        // Cria uma lista de números disponíveis para o jogo
+        const numerosDisponiveis = Array.from({ length: 60 }, (_, i) => i + 1)
+            .filter(num => !excluirPares.includes(num) && !excluirImpares.includes(num) && num !== fixar);
+
+        if (numerosDisponiveis.length < 6) {
+            alert("Não há números suficientes para gerar jogos.");
+            return;
+        }
+
+        const jogos = [];
         
-        // Formatação dos jogos
-        const jogoElement = document.createElement('p');
-        jogoElement.innerHTML = `J${j + 1}- ${totalDezenas.map(num => {
-            if (num === fixar) {
-                // Destaca a dezena fixada com uma cor diferente
-                return `<span style="color: red; font-weight: bold; font-family: Arial, sans-serif;">${num.toString().padStart(2, '0')}</span>`;
-            } else {
-                return `<span style="font-family: Courier New, monospace;">${num.toString().padStart(2, '0')}</span>`;
+        for (let j = 0; j < quantidadeJogos; j++) {
+            let numerosAleatorios = [...numerosDisponiveis];
+            
+            let adicionais = [];
+            if (dezenasAdicionais > 0) {
+                adicionais = Array.from({ length: dezenasAdicionais }, () => {
+                    const index = Math.floor(Math.random() * numerosAleatorios.length);
+                    return numerosAleatorios.splice(index, 1)[0];
+                });
             }
-        }).join(', ')}`;
-        jogoElement.style.border = '1px solid #dcdcdc'; // Tom de cinza claro para a borda
-        jogoElement.style.padding = '10px';
-        jogoElement.style.margin = '5px 0';
-        jogoElement.style.textAlign = 'center'; // Centraliza o texto
-        jogoElement.style.backgroundColor = '#f5f5f5'; // Tom de cinza claro para o fundo
-        jogoElement.style.color = '#333'; // Tom de cinza escuro para o texto
-        jogoElement.style.fontSize = '16px'; // Ajusta o tamanho da fonte
-        jogoElement.style.borderRadius = '4px'; // Bordas arredondadas
+            
+            const jogo = [fixar];
+            
+            while (jogo.length < 6) {
+                const index = Math.floor(Math.random() * numerosAleatorios.length);
+                const numero = numerosAleatorios.splice(index, 1)[0];
+                jogo.push(numero);
+            }
+            
+            jogo.sort((a, b) => a - b);
+
+            if (!jogos.some(existingJogo => existingJogo.jogo.join() === jogo.join())) {
+                jogos.push({ jogo, adicionais });
+            }
+        }
         
-        jogos.push(jogoElement);
+        const jogosGeradosDiv = document.getElementById('jogosGerados');
+        jogosGeradosDiv.innerHTML = '<h2>Jogos Gerados:</h2>';
+        
+        jogos.forEach((item, index) => {
+            const jogo = item.jogo;
+            const adicionais = item.adicionais;
+            
+            const jogoElement = document.createElement('p');
+            jogoElement.innerHTML = `Jogo ${index + 1}: ${jogo.map(num => {
+                if (num === fixar) {
+                    // Destaca a dezena fixada com uma cor diferente
+                    return `<span style="color: red; font-weight: bold; font-family: Arial, sans-serif;">${num.toString().padStart(2, '0')}</span>`;
+                } else if (adicionais.includes(num)) {
+                    // Destaca as dezenas adicionais com uma cor diferente
+                    return `<span style="color: blue; font-weight: bold; font-family: Arial, sans-serif;">${num.toString().padStart(2, '0')}</span>`;
+                } else {
+                    return `<span style="font-family: Courier New, monospace;">${num.toString().padStart(2, '0')}</span>`;
+                }
+            }).join(', ')}`;
+            jogosGeradosDiv.appendChild(jogoElement);
+        });
+
+    } catch (error) {
+        // Captura erros de validação
+        console.error("Erro na validação dos campos:", error);
     }
-    
-    const jogosGerados = document.getElementById('jogosGerados');
-    jogosGerados.innerHTML = '';
-    jogos.forEach(jogoElement => jogosGerados.appendChild(jogoElement));
 }
 
-function salvarJogo() {
-    let jogos = document.getElementById('jogosGerados').innerText.trim();
-    
-    if (jogos === '') {
-        alert("Nenhum jogo foi gerado.");
-        return;
-    }
-    
-    // Remove a letra 'J', os hífens e as vírgulas
-    jogos = jogos.replace(/J\d+-\s*/g, ''); // Remove a letra 'J' e o número seguido de hífen
-    jogos = jogos.replace(/,/g, ''); // Remove apenas as vírgulas, mantendo os espaços
 
-    const blob = new Blob([jogos], { type: 'text/plain' });
+
+function salvarJogo() {
+    // Obtém o texto dos jogos gerados
+    let jogosTexto = document.getElementById('jogosGerados').innerText;
+
+    // Remove a primeira linha (título "Jogos Gerados") e processa o texto
+    const linhas = jogosTexto.split('\n');
+    linhas.shift(); // Remove a primeira linha
+    jogosTexto = linhas.join('\n');
+
+    // Remove a palavra "Jogo" e substitui hífens e vírgulas por espaços, tudo em uma linha
+    jogosTexto = jogosTexto.replace(/Jogo \d+:/g, '').replace(/-/g, '').replace(/,/g, '');
+
+    // Cria um Blob com o texto processado
+    const blob = new Blob([jogosTexto], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
-    
+
+    // Cria um link para download do arquivo
     const a = document.createElement('a');
     a.href = url;
     a.download = 'jogos_megasena.txt';
     a.click();
-    
+
+    // Revoga o URL para liberar recursos
     URL.revokeObjectURL(url);
 }
 
 
 
+
 function exportarParaExcel() {
-    const jogos = document.getElementById('jogosGerados').innerText.trim();
+    const jogosGeradosDiv = document.getElementById('jogosGerados');
+    const rows = Array.from(jogosGeradosDiv.getElementsByTagName('p')).map(p => [p.innerText]);
     
-    if (jogos === '') {
-        alert("Nenhum jogo foi gerado.");
-        return;
-    }
-    
+    const ws = XLSX.utils.aoa_to_sheet(rows);
     const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(jogos.split('\n').map(jogo => [jogo]));
-    XLSX.utils.book_append_sheet(wb, ws, 'Jogos');
+    XLSX.utils.book_append_sheet(wb, ws, "Jogos");
     
     XLSX.writeFile(wb, 'jogos_megasena.xlsx');
 }
@@ -178,6 +226,4 @@ function resetarJogo() {
     document.getElementById('jogos').value = '';
     document.getElementById('dezenas-adicionais').value = '';
     document.getElementById('jogosGerados').innerHTML = '';
-    document.getElementById('erro-pares').textContent = '';
-    document.getElementById('erro-impares').textContent = '';
 }

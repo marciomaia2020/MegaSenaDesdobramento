@@ -8,6 +8,7 @@ body {
     align-items: center;
     height: 100vh;
     overflow-y: auto;
+    margin-top: 15px;
 }
 
 .container {
@@ -51,7 +52,8 @@ h1, h3 {
 
 .instructions {
     margin-bottom: 20px;
-    font-size: 14px;
+    font-size: 13px;
+    color: gray;
 }
 
 .number-selection {
