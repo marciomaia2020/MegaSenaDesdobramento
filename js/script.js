@@ -171,22 +171,24 @@ function gerarJogos() {
             }).join(', ')}`;
             jogosGeradosDiv.appendChild(jogoElement);
         });
-        // Exibe a mensagem de sucesso
-        const mensagemSucesso = document.getElementById('mensagemSucesso');
-        mensagemSucesso.textContent = "Jogos gerados com sucesso!";
-        mensagemSucesso.style.display = 'block';
 
-        // Centralizar a mensagem de sucesso
-        mensagemSucesso.style.position = 'fixed';
-        mensagemSucesso.style.top = '50%';
-        mensagemSucesso.style.left = '50%';
-        mensagemSucesso.style.transform = 'translate(-50%, -50%)';
-        mensagemSucesso.style.backgroundColor = '#4CAF50'; // Cor de fundo para destaque
-        mensagemSucesso.style.color = '#fff'; // Cor do texto
-        mensagemSucesso.style.padding = '20px';
-        mensagemSucesso.style.borderRadius = '10px';
-        mensagemSucesso.style.textAlign = 'center';
-        mensagemSucesso.style.zIndex = '500'; // Garante que a mensagem esteja acima de outros elementos
+
+            // Exibe a mensagem de sucesso com a quantidade de jogos gerados
+            const mensagemSucesso = document.getElementById('mensagemSucesso');
+            mensagemSucesso.innerHTML = `<span style="color: red;">${quantidadeJogos}</span> jogos gerados com sucesso!`;
+            mensagemSucesso.style.display = 'block';
+
+            // Centralizar a mensagem de sucesso
+            mensagemSucesso.style.position = 'fixed';
+            mensagemSucesso.style.top = '50%';
+            mensagemSucesso.style.left = '50%';
+            mensagemSucesso.style.transform = 'translate(-50%, -50%)';
+            mensagemSucesso.style.backgroundColor = '#4CAF50'; // Cor de fundo para destaque
+            mensagemSucesso.style.color = '#fff'; // Cor do texto
+            mensagemSucesso.style.padding = '20px';
+            mensagemSucesso.style.borderRadius = '10px';
+            mensagemSucesso.style.textAlign = 'center';
+            mensagemSucesso.style.zIndex = '500'; // Garante que a mensagem esteja acima de outros elementos
         
     } catch (error) {
         // Captura erros de validação
