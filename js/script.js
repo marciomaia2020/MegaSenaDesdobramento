@@ -171,28 +171,22 @@ function gerarJogos() {
             }).join(', ')}`;
             jogosGeradosDiv.appendChild(jogoElement);
         });
-        // Exibe a mensagem de sucesso com a quantidade de jogos gerados
+        // Exibe a mensagem de sucesso
         const mensagemSucesso = document.getElementById('mensagemSucesso');
-        const mensagem = quantidadeJogos === 1 
-            ? `<span style="color: red;">1</span> jogo gerado com sucesso!`
-            : `<span style="color: red;">${quantidadeJogos}</span> jogos gerados com sucesso!`;
-        mensagemSucesso.innerHTML = mensagem;
+        mensagemSucesso.textContent = "Jogos gerados com sucesso!";
         mensagemSucesso.style.display = 'block';
 
-        // Posicionar a mensagem de sucesso na parte inferior da tela sem bloquear botões
+        // Centralizar a mensagem de sucesso
         mensagemSucesso.style.position = 'fixed';
-        mensagemSucesso.style.TOP = '10px'; // Posição na parte inferior
+        mensagemSucesso.style.top = '50%';
         mensagemSucesso.style.left = '50%';
-        mensagemSucesso.style.transform = 'translateX(-50%)';
+        mensagemSucesso.style.transform = 'translate(-50%, -50%)';
         mensagemSucesso.style.backgroundColor = '#4CAF50'; // Cor de fundo para destaque
         mensagemSucesso.style.color = '#fff'; // Cor do texto
-        mensagemSucesso.style.padding = '10px';
-        mensagemSucesso.style.borderRadius = '5px';
+        mensagemSucesso.style.padding = '20px';
+        mensagemSucesso.style.borderRadius = '10px';
         mensagemSucesso.style.textAlign = 'center';
-        mensagemSucesso.style.zIndex = '100'; // Garantir que a mensagem não sobreponha botões
-        mensagemSucesso.style.pointerEvents = 'yes'; // Não captura cliques
-
-
+        mensagemSucesso.style.zIndex = '500'; // Garante que a mensagem esteja acima de outros elementos
         
     } catch (error) {
         // Captura erros de validação
