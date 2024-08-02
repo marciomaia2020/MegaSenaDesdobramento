@@ -179,15 +179,15 @@ function gerarJogos() {
         mensagemSucesso.innerHTML = mensagem;
         mensagemSucesso.style.display = 'block';
 
-        // Centralizar a mensagem de sucesso
-        mensagemSucesso.style.position = 'fixed';
-        mensagemSucesso.style.top = '50%';
+        // Centralizar a mensagem de sucesso em uma posição não sobreposta
+        mensagemSucesso.style.position = 'absolute';
+        mensagemSucesso.style.bottom = '10px';
         mensagemSucesso.style.left = '50%';
-        mensagemSucesso.style.transform = 'translate(-50%, -50%)';
+        mensagemSucesso.style.transform = 'translateX(-50%)';
         mensagemSucesso.style.backgroundColor = '#4CAF50'; // Cor de fundo para destaque
         mensagemSucesso.style.color = '#fff'; // Cor do texto
-        mensagemSucesso.style.padding = '20px';
-        mensagemSucesso.style.borderRadius = '10px';
+        mensagemSucesso.style.padding = '10px';
+        mensagemSucesso.style.borderRadius = '5px';
         mensagemSucesso.style.textAlign = 'center';
         mensagemSucesso.style.zIndex = '500'; // Garante que a mensagem esteja acima de outros elementos
         
