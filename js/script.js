@@ -179,10 +179,9 @@ function gerarJogos() {
         mensagemSucesso.innerHTML = mensagem;
         mensagemSucesso.style.display = 'block';
 
-        // Centralizar a mensagem de sucesso em uma posição não sobreposta
-        /*mensagemSucesso.style.position = 'absolute';*/
+        // Posicionar a mensagem de sucesso na parte inferior da tela sem bloquear botões
         mensagemSucesso.style.position = 'fixed';
-        mensagemSucesso.style.bottom = '10px';
+        mensagemSucesso.style.TOP = '10px'; // Posição na parte inferior
         mensagemSucesso.style.left = '50%';
         mensagemSucesso.style.transform = 'translateX(-50%)';
         mensagemSucesso.style.backgroundColor = '#4CAF50'; // Cor de fundo para destaque
@@ -190,7 +189,10 @@ function gerarJogos() {
         mensagemSucesso.style.padding = '10px';
         mensagemSucesso.style.borderRadius = '5px';
         mensagemSucesso.style.textAlign = 'center';
-        mensagemSucesso.style.zIndex = '500'; // Garante que a mensagem esteja acima de outros elementos
+        mensagemSucesso.style.zIndex = '100'; // Garantir que a mensagem não sobreponha botões
+        mensagemSucesso.style.pointerEvents = 'yes'; // Não captura cliques
+
+
         
     } catch (error) {
         // Captura erros de validação
