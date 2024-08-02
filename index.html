@@ -22,30 +22,30 @@
             <p><strong>INSTRUÇÕES:</strong></p>
             <ol>
                 <li>Selecione <strong><i>10 dezenas Pares</i></strong>.</li>
-                <li>Selecione <strong><i>10 dezenas Ímpares</i></strong>.</li>
-                <li>Escolha <strong><i>1 dezena</i></strong> para fixar.</li>
-                <li>Selecione a <strong><i>quantidade de jogos</i></strong> que deseja gerar.</li>
-                <li>Selecione <strong><i>quantas dezenas</i></strong> quer adicionar(<span style="color: red;">opcional</span>).</li>
-                <li>Salve o jogo para abrir no<strong><i> Bloco de Notas</i></strong> ou exporte para o<strong><i> Excel</i></strong>.</li>
+                <li>Selecione <strong><i></i>10 dezenas Ímpares</i></strong>.</li>
+                <li>Escolha <strong><i></i>1 dezena</i></strong> para fixar.</li>
+                <li>Selecione a <strong><i></i>quantidade de jogos</i></strong> que deseja gerar.</li>
+                <li>Selecione <strong><i></i>quantas dezenas</i></strong> quer adicionar(<span style="color: red;">opcional</span>).</li>
+                <li>Salve o jogo para abrir no<strong><i> Bloco de Nota</i></strong> ou exporte para o<strong><i> Excel</i></strong>.</li>
             </ol>
         </div>
         <div class="number-selection">
-            <label for="excluir-pares">1 - Dezenas <b>pares</b> a excluir:</label>
+            <label for="excluir-pares">1 - Dezenas pares a excluir:</label>
             <input type="text" id="excluir-pares" placeholder="Digite dezenas Pares separadas por vírgula">
             <div id="erro-pares" class="erro"></div>
         </div>
         <div class="number-selection">
-            <label for="excluir-impares">2 - Dezenas <b>ímpares</b> a excluir:</label>
+            <label for="excluir-impares">2 - Dezenas ímpares a excluir:</label>
             <input type="text" id="excluir-impares" placeholder="Digite dezenas Ímpares separadas por vírgula">
             <div id="erro-impares" class="erro"></div>
         </div>
         <div class="number-selection">
-            <label for="fixar">3 - Dezena a <b>fixar</b>:</label>
+            <label for="fixar">3 - Dezena a fixar:</label>
             <input type="text" id="fixar" placeholder="Ex: 07">
             <div id="erro-fixar" class="erro"></div>
         </div>
         <div class="number-selection">
-            <label for="jogos">4 - Quantidade de jogos a gerar:</label>
+            <label for="jogos">4 - Quantidade de jogos:</label>
             <input type="number" id="jogos" min="1" max="100" placeholder="Ex: 5">
             <div id="erro-jogos" class="erro"></div>
         </div>
@@ -78,7 +78,49 @@
 </html>
 
 
+
 <!--
+***
+Fazer um resumo para ver tudo o que falta fazer e ir 
+fazendo e testando SUBIR SEMPRE E USAR A COPIA SEMPRE
+
+
+***
 Ajustar o codigo megaSenaDes
-Ao gerer jogos a tela não rola (ela deve rolar normalmente... )
+Ao gerar jogos a tela não rola (ela deve rolar normalmente... )
+
+***
+assegure de que os numeros não possa passar de duas unidades
+ex: 
+2,4,06,8,10 (permitido)
+2,444,06,8,10 (NÃO permitido)
+
+
+***
+ESTÁ TUDO OK COM O CÓDIGO
+PORÉM A MENSAGEM QUE O NUMERO FOI GERADO COM SUCESSO FICA GARANTIDO que a mensagem esteja acima de outros elementos
+ISSO ESTA EVITANDO QUE O USUARIO CLIQUE NOS BOTÕES PARA 
+Resetar, salvar e exportar e preciso que o usuario tenha acesso a estes botões
+
+
+USAR ESTE CÓDIGO PARA VER SE APARECE BOTÃO
+INFORMANDO QUANTOS JOGOS FORAM GERADOS
+--ja está tratando as questões
+Singular - se for um jogo entao "1 jogo foi gerado"
+Plural - se for mais que um jogo "2 jogos foram gerados"
+
+O QUE ESTA PEGANDO É QUE ELE DESABILITA OS BOTÕES
+
+<div class="button-container">
+            <button onclick="gerarJogos()">Gerar Jogos</button>
+            <button onclick="resetarJogo()">Resetar Jogo</button>
+            <button onclick="salvarJogo()">Salvar Jogo</button>
+            <button onclick="exportarParaExcel()">Exportar para Excel</button>
+        </div>
+
+
+
+
+
+
 -->
