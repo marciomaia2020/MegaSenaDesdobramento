@@ -68,20 +68,19 @@ function validarJogos() {
     }
 }
 
+
 document.getElementById('excluir-pares').addEventListener('input', () => validarCampo('excluir-pares', 'pares'));
 document.getElementById('excluir-impares').addEventListener('input', () => validarCampo('excluir-impares', 'impares'));
 document.getElementById('fixar').addEventListener('input', validarFixar);
 document.getElementById('jogos').addEventListener('input', validarJogos);
-
-
 
 function gerarJogos() {
     // Função para validar e obter valores dos campos
     function obterValor(id) {
         const valor = document.getElementById(id).value.trim();
         const numero = Number(valor);
-        if (isNaN(numero) || numero <= 0 || numero > 60) {
-            alert(`O valor em ${id} deve ser um número entre 1 e 60.`);
+        if (isNaN(numero) || numero <= 0 || numero > 1000) {
+            alert(`O valor em ${id} deve ser um número entre 1 e 1000.`);
             throw new Error(`Valor inválido em ${id}`);
         }
         return numero;
@@ -97,6 +96,7 @@ function gerarJogos() {
             alert("Quantidade de jogos inválida. Deve ser entre 1 e 1000.");
             return;
         }
+        
         
         if (dezenasAdicionais < 0 || dezenasAdicionais > 5) {
             alert("Número de dezenas adicionais deve ser entre 0 e 5.");
@@ -144,6 +144,7 @@ function gerarJogos() {
             
             jogo.sort((a, b) => a - b);
 
+            // Evita jogos duplicados
             if (!jogos.some(existingJogo => existingJogo.jogo.join() === jogo.join())) {
                 jogos.push({ jogo, adicionais });
             }
@@ -170,60 +171,25 @@ function gerarJogos() {
             }).join(', ')}`;
             jogosGeradosDiv.appendChild(jogoElement);
         });
+        // Exibe a mensagem de sucesso
+        const mensagemSucesso = document.getElementById('mensagemSucesso');
+        mensagemSucesso.textContent = "Jogos gerados com sucesso!";
+        mensagemSucesso.style.display = 'block';
 
+        // Centralizar a mensagem de sucesso
+        mensagemSucesso.style.position = 'fixed';
+        mensagemSucesso.style.top = '50%';
+        mensagemSucesso.style.left = '50%';
+        mensagemSucesso.style.transform = 'translate(-50%, -50%)';
+        mensagemSucesso.style.backgroundColor = '#4CAF50'; // Cor de fundo para destaque
+        mensagemSucesso.style.color = '#fff'; // Cor do texto
+        mensagemSucesso.style.padding = '20px';
+        mensagemSucesso.style.borderRadius = '10px';
+        mensagemSucesso.style.textAlign = 'center';
+        mensagemSucesso.style.zIndex = '500'; // Garante que a mensagem esteja acima de outros elementos
+        
     } catch (error) {
         // Captura erros de validação
         console.error("Erro na validação dos campos:", error);
     }
-}
-
-
-
-function salvarJogo() {
-    // Obtém o texto dos jogos gerados
-    let jogosTexto = document.getElementById('jogosGerados').innerText;
-
-    // Remove a primeira linha (título "Jogos Gerados") e processa o texto
-    const linhas = jogosTexto.split('\n');
-    linhas.shift(); // Remove a primeira linha
-    jogosTexto = linhas.join('\n');
-
-    // Remove a palavra "Jogo" e substitui hífens e vírgulas por espaços, tudo em uma linha
-    jogosTexto = jogosTexto.replace(/Jogo \d+:/g, '').replace(/-/g, '').replace(/,/g, '');
-
-    // Cria um Blob com o texto processado
-    const blob = new Blob([jogosTexto], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-
-    // Cria um link para download do arquivo
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'jogos_megasena.txt';
-    a.click();
-
-    // Revoga o URL para liberar recursos
-    URL.revokeObjectURL(url);
-}
-
-
-
-
-function exportarParaExcel() {
-    const jogosGeradosDiv = document.getElementById('jogosGerados');
-    const rows = Array.from(jogosGeradosDiv.getElementsByTagName('p')).map(p => [p.innerText]);
-    
-    const ws = XLSX.utils.aoa_to_sheet(rows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Jogos");
-    
-    XLSX.writeFile(wb, 'jogos_megasena.xlsx');
-}
-
-function resetarJogo() {
-    document.getElementById('excluir-pares').value = '';
-    document.getElementById('excluir-impares').value = '';
-    document.getElementById('fixar').value = '';
-    document.getElementById('jogos').value = '';
-    document.getElementById('dezenas-adicionais').value = '';
-    document.getElementById('jogosGerados').innerHTML = '';
 }
