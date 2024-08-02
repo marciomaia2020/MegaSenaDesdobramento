@@ -180,7 +180,8 @@ function gerarJogos() {
         mensagemSucesso.style.display = 'block';
 
         // Centralizar a mensagem de sucesso em uma posição não sobreposta
-        mensagemSucesso.style.position = 'absolute';
+        /*mensagemSucesso.style.position = 'absolute';*/
+        mensagemSucesso.style.position = 'fixed';
         mensagemSucesso.style.bottom = '10px';
         mensagemSucesso.style.left = '50%';
         mensagemSucesso.style.transform = 'translateX(-50%)';
