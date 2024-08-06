@@ -80,60 +80,54 @@ function validarJogos() {
         erroJogos.textContent = '';
     }
 }
-
-document.getElementById('excluir-pares').addEventListener('input', () => validarCampo('excluir-pares', 'pares'));
-document.getElementById('excluir-impares').addEventListener('input', () => validarCampo('excluir-impares', 'impares'));
-document.getElementById('fixar').addEventListener('input', validarFixar);
-document.getElementById('jogos').addEventListener('input', validarJogos);
-
-
-
-// INICIO - Função para validar a quantidade de dezenas adicionais
 function validarDezenasAdicionais() {
     const dezenasAdicionaisInput = document.getElementById('dezenas-adicionais');
     const erroDezenasAdicionais = document.getElementById('erro-dezenas-adicionais');
     const dezenasAdicionais = Number(dezenasAdicionaisInput.value.trim());
 
-    if (dezenasAdicionais < 7 || dezenasAdicionais > 20) {
-        erroDezenasAdicionais.textContent = "O número de dezenas adicionais deve estar entre 7 e 20.";
+    if (dezenasAdicionais < 1 || dezenasAdicionais > 14) {
+        erroDezenasAdicionais.textContent = "O número de dezenas adicionais deve estar entre 1 e 14.";
         return null;
     } else {
         erroDezenasAdicionais.textContent = '';
         return dezenasAdicionais;
     }
 }
+
+document.getElementById('excluir-pares').addEventListener('input', () => validarCampo('excluir-pares', 'pares'));
+document.getElementById('excluir-impares').addEventListener('input', () => validarCampo('excluir-impares', 'impares'));
+document.getElementById('fixar').addEventListener('input', validarFixar);
+document.getElementById('jogos').addEventListener('input', validarJogos);
 document.getElementById('dezenas-adicionais').addEventListener('input', validarDezenasAdicionais);
-// FINAL - Função para validar a quantidade de dezenas adicionais
+document.getElementById('gerar').addEventListener('click', gerarJogos);
 
 
-// Atualize a função gerarJogos para incluir a validação das dezenas adicionais
+
+
 function gerarJogos() {
     try {
         const fixar = validarFixar();
         if (fixar === null) return; // Interrompe a execução se a validação da dezena fixa falhar
 
-        const quantidadeJogos = Number(document.getElementById('jogos').value.trim());
-        const dezenasAdicionais = validarDezenasAdicionais();
+        const dezenasAdicionais = validarDezenasAdicionais(); // Quantidade de dezenas adicionais escolhidas pelo usuário
 
-        if (quantidadeJogos <= 0 || quantidadeJogos > 1000) {
-            alert("Quantidade de jogos inválida. Deve ser entre 1 e 1000.");
+        if (dezenasAdicionais === null || dezenasAdicionais < 1 || dezenasAdicionais > 14) {
+            alert("Número de dezenas adicionais inválido. Deve ser entre 1 e 14.");
             return;
         }
 
-        if (dezenasAdicionais === null) {
-            // Interrompe a execução se a validação das dezenas adicionais falhar
-            return;
-        }
+        const quantidadeJogos = dezenasAdicionais; // A quantidade total de jogos será igual ao número de dezenas adicionais
 
         const excluirPares = (document.getElementById('excluir-pares').value.trim().split(',').map(Number) || []);
         const excluirImpares = (document.getElementById('excluir-impares').value.trim().split(',').map(Number) || []);
-        
+
         if (fixar < 1 || fixar > 60) {
             alert("Número fixado inválido. Deve ser entre 1 e 60.");
             return;
         }
 
-        const numerosDisponiveis = Array.from({ length: 60 }, (_, i) => i + 1)
+        // Números disponíveis excluindo pares, ímpares e o número fixo
+        let numerosDisponiveis = Array.from({ length: 60 }, (_, i) => i + 1)
             .filter(num => !excluirPares.includes(num) && !excluirImpares.includes(num) && num !== fixar);
 
         if (numerosDisponiveis.length < 6) {
@@ -142,46 +136,38 @@ function gerarJogos() {
         }
 
         const jogos = [];
-        
+
         for (let j = 0; j < quantidadeJogos; j++) {
             let numerosAleatorios = [...numerosDisponiveis];
-            
-            let adicionais = [];
-            if (dezenasAdicionais > 0) {
-                adicionais = Array.from({ length: dezenasAdicionais }, () => {
-                    const index = Math.floor(Math.random() * numerosAleatorios.length);
-                    return numerosAleatorios.splice(index, 1)[0];
-                });
-            }
-            
             const jogo = [fixar];
-            
-            while (jogo.length < 6) {
+
+            // Preenche o restante do jogo com números aleatórios, totalizando o número de dezenas adicionais
+            while (jogo.length < 6 + dezenasAdicionais) {
+                if (numerosAleatorios.length === 0) break;
                 const index = Math.floor(Math.random() * numerosAleatorios.length);
                 const numero = numerosAleatorios.splice(index, 1)[0];
                 jogo.push(numero);
             }
-            
+
+            // Ordena os números
             jogo.sort((a, b) => a - b);
 
+            // Evita duplicatas
             if (!jogos.some(existingJogo => existingJogo.jogo.join() === jogo.join())) {
-                jogos.push({ jogo, adicionais });
+                jogos.push({ jogo });
             }
         }
-        
+
         const jogosGeradosDiv = document.getElementById('jogosGerados');
         jogosGeradosDiv.innerHTML = '<h2>Jogos Gerados:</h2>';
-        
+
         jogos.forEach((item, index) => {
             const jogo = item.jogo;
-            const adicionais = item.adicionais;
-            
+
             const jogoElement = document.createElement('p');
             jogoElement.innerHTML = `Jogo ${index + 1}: ${jogo.map(num => {
                 if (num === fixar) {
                     return `<span style="color: red; font-weight: bold; font-family: Arial, sans-serif;">${num.toString().padStart(2, '0')}</span>`;
-                } else if (adicionais.includes(num)) {
-                    return `<span style="color: blue; font-weight: bold; font-family: Arial, sans-serif;">${num.toString().padStart(2, '0')}</span>`;
                 } else {
                     return `<span style="font-family: Courier New, monospace;">${num.toString().padStart(2, '0')}</span>`;
                 }
@@ -215,7 +201,7 @@ function gerarJogos() {
     }
 }
 
-document.getElementById('gerar').addEventListener('click', gerarJogos);
+
 
 
 //ESTE
@@ -246,7 +232,7 @@ function validarDezenas() {
     var erroDiv = document.getElementById("erro-dezenas-adicionais");
     var valor = input.value;
     
-    if (valor < 7 || valor > 20 || isNaN(valor)) {
+    if (valor < 7 || valor > 14 || isNaN(valor)) {
         // Exibir mensagem de erro
         erroDiv.style.display = "block";
     } else {
