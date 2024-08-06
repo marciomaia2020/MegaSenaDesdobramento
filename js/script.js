@@ -48,11 +48,24 @@ function validarFixar() {
     const fixarInput = document.getElementById('fixar');
     const erroFixar = document.getElementById('erro-fixar');
     const fixar = Number(fixarInput.value.trim());
-    
+
+    // Obtém os números pares e ímpares a serem excluídos
+    const excluirPares = validarCampo('excluir-pares', 'pares');
+    const excluirImpares = validarCampo('excluir-impares', 'impares');
+
+    // Verifica se a dezena fixa é válida
     if (isNaN(fixar) || fixar < 1 || fixar > 60) {
         erroFixar.textContent = "A dezena fixa deve estar entre 1 e 60.";
+        return null;
+    } else if (excluirPares.includes(fixar)) {
+        erroFixar.textContent = "A dezena fixa não pode ser um número par excluído.";
+        return null;
+    } else if (excluirImpares.includes(fixar)) {
+        erroFixar.textContent = "A dezena fixa não pode ser um número ímpar excluído.";
+        return null;
     } else {
         erroFixar.textContent = '';
+        return fixar;
     }
 }
 
@@ -67,7 +80,6 @@ function validarJogos() {
         erroJogos.textContent = '';
     }
 }
-
 
 document.getElementById('excluir-pares').addEventListener('input', () => validarCampo('excluir-pares', 'pares'));
 document.getElementById('excluir-impares').addEventListener('input', () => validarCampo('excluir-impares', 'impares'));
@@ -88,7 +100,9 @@ function gerarJogos() {
 
     // Obtém os valores dos campos e faz a validação
     try {
-        const fixar = obterValor('fixar');
+        const fixar = validarFixar();
+        if (fixar === null) return; // Interrompe a execução se a validação da dezena fixa falhar
+
         const quantidadeJogos = obterValor('jogos');
         const dezenasAdicionais = Number(document.getElementById('dezenas-adicionais').value.trim());
 
@@ -96,7 +110,6 @@ function gerarJogos() {
             alert("Quantidade de jogos inválida. Deve ser entre 1 e 1000.");
             return;
         }
-        
         
         if (dezenasAdicionais < 0 || dezenasAdicionais > 5) {
             alert("Número de dezenas adicionais deve ser entre 0 e 5.");
@@ -171,54 +184,113 @@ function gerarJogos() {
             }).join(', ')}`;
             jogosGeradosDiv.appendChild(jogoElement);
         });
-        // Exibe a mensagem de sucesso
-        const mensagemSucesso = document.getElementById('mensagemSucesso');
-        mensagemSucesso.textContent = "Jogos gerados com sucesso!";
-        mensagemSucesso.style.display = 'block';
 
-        // Centralizar a mensagem de sucesso
+        // Cria e exibe a mensagem de sucesso
+        const mensagemSucesso = document.createElement('div');
+        mensagemSucesso.innerHTML = `<span style="color: red; font-weight: bold;">${quantidadeJogos}</span> Jogo${quantidadeJogos > 1 ? 's' : ''} gerado${quantidadeJogos > 1 ? 's' : ''} com sucesso!`;
         mensagemSucesso.style.position = 'fixed';
         mensagemSucesso.style.top = '50%';
         mensagemSucesso.style.left = '50%';
         mensagemSucesso.style.transform = 'translate(-50%, -50%)';
-        mensagemSucesso.style.backgroundColor = '#4CAF50'; // Cor de fundo para destaque
-        mensagemSucesso.style.color = '#fff'; // Cor do texto
+        mensagemSucesso.style.backgroundColor = '#dff0d8';
         mensagemSucesso.style.padding = '20px';
-        mensagemSucesso.style.borderRadius = '10px';
+        mensagemSucesso.style.border = '1px solid #d0e9c6';
+        mensagemSucesso.style.borderRadius = '5px';
+        mensagemSucesso.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
+        mensagemSucesso.style.fontFamily = 'Arial, sans-serif';
+        mensagemSucesso.style.fontSize = '18px';
         mensagemSucesso.style.textAlign = 'center';
-        mensagemSucesso.style.zIndex = '500'; // Garante que a mensagem esteja acima de outros elementos
         
+        document.body.appendChild(mensagemSucesso);
+
+        setTimeout(() => {
+            document.body.removeChild(mensagemSucesso);
+        }, 3000);
+
     } catch (error) {
-        // Captura erros de validação
-        console.error("Erro na validação dos campos:", error);
+        console.error('Erro ao gerar os jogos:', error.message);
     }
 }
+
+document.getElementById('gerar').addEventListener('click', gerarJogos);
+
+
 
 //ESTE
-function validarFixar() {
-    const fixarInput = document.getElementById('fixar');
-    const erroFixar = document.getElementById('erro-fixar');
-    const fixar = Number(fixarInput.value.trim());
+function resetarJogo() {
+    // Limpa os campos de entrada
+    document.getElementById('excluir-pares').value = '';
+    document.getElementById('excluir-impares').value = '';
+    document.getElementById('fixar').value = '';
+    document.getElementById('jogos').value = '';
+    document.getElementById('dezenas-adicionais').value = '';
 
-    // Obtém os números pares e ímpares a serem excluídos
-    const excluirPares = validarCampo('excluir-pares', 'pares');
-    const excluirImpares = validarCampo('excluir-impares', 'impares');
+    // Limpa a área de mensagens de erro
+    document.getElementById('erro-pares').textContent = '';
+    document.getElementById('erro-impares').textContent = '';
+    document.getElementById('erro-fixar').textContent = '';
+    document.getElementById('erro-jogos').textContent = '';
 
-    // Verifica se a dezena fixa é válida
-    if (isNaN(fixar) || fixar < 1 || fixar > 60) {
-        erroFixar.textContent = "A dezena fixa deve estar entre 1 e 60.";
-        return null;
-    } else if (excluirPares.includes(fixar)) {
-        erroFixar.textContent = "A dezena fixa não pode ser um número par excluído.";
-        return null;
-    } else if (excluirImpares.includes(fixar)) {
-        erroFixar.textContent = "A dezena fixa não pode ser um número ímpar excluído.";
-        return null;
-    } else {
-        erroFixar.textContent = '';
-        return fixar;
-    }
+    // Limpa a área de jogos gerados
+    document.getElementById('jogosGerados').innerHTML = '';
+
+    // Limpa a mensagem de sucesso
+    document.getElementById('mensagemSucesso').innerHTML = '';
 }
 
 
 
+
+//ESTE
+function salvarJogo() {
+    const jogosGeradosDiv = document.getElementById('jogosGerados');
+    const jogos = Array.from(jogosGeradosDiv.querySelectorAll('p')).map(p => {
+        const texto = p.textContent || p.innerText;
+        // Extrai apenas os números do texto do jogo
+        return texto.match(/\d{2}/g).join(' ');
+    });
+
+    if (jogos.length === 0) {
+        alert("Nenhum jogo gerado para salvar.");
+        return;
+    }
+
+    // Cria o conteúdo do arquivo
+    const conteudo = jogos.join('\n');
+    const blob = new Blob([conteudo], { type: 'text/plain;charset=utf-8' });
+    
+    // Cria um link de download e aciona o download
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'jogos_megasena.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+
+//ESTE
+function exportarParaExcel() {
+    const jogosGeradosDiv = document.getElementById('jogosGerados');
+    const jogos = Array.from(jogosGeradosDiv.querySelectorAll('p')).map(p => {
+        const texto = p.textContent || p.innerText;
+        // Extrai apenas os números do texto do jogo
+        return texto.match(/\d{2}/g).join(', ');
+    });
+
+    if (jogos.length === 0) {
+        alert("Nenhum jogo gerado para exportar.");
+        return;
+    }
+
+    // Cria uma planilha de dados
+    const wb = XLSX.utils.book_new();
+    const wsData = jogos.map(jogo => jogo.split(', '));
+    
+    // Adiciona uma aba com os dados
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    XLSX.utils.book_append_sheet(wb, ws, "Jogos Mega-Sena");
+
+    // Gera o arquivo Excel
+    XLSX.writeFile(wb, 'jogos_megasena.xlsx');
+}
