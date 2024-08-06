@@ -79,7 +79,9 @@ function validarJogos() {
     } else {
         erroJogos.textContent = '';
     }
+    return jogos;
 }
+
 function validarDezenasAdicionais() {
     const dezenasAdicionaisInput = document.getElementById('dezenas-adicionais');
     const erroDezenasAdicionais = document.getElementById('erro-dezenas-adicionais');
@@ -99,10 +101,6 @@ document.getElementById('excluir-impares').addEventListener('input', () => valid
 document.getElementById('fixar').addEventListener('input', validarFixar);
 document.getElementById('jogos').addEventListener('input', validarJogos);
 document.getElementById('dezenas-adicionais').addEventListener('input', validarDezenasAdicionais);
-document.getElementById('gerar').addEventListener('click', gerarJogos);
-
-
-
 
 function gerarJogos() {
     try {
@@ -116,7 +114,9 @@ function gerarJogos() {
             return;
         }
 
-        const quantidadeJogos = dezenasAdicionais; // A quantidade total de jogos será igual ao número de dezenas adicionais
+        const quantidadeJogos = validarJogos(); // Obtém a quantidade total de jogos
+
+        if (quantidadeJogos === 0) return; // Interrompe a execução se a validação da quantidade de jogos falhar
 
         const excluirPares = (document.getElementById('excluir-pares').value.trim().split(',').map(Number) || []);
         const excluirImpares = (document.getElementById('excluir-impares').value.trim().split(',').map(Number) || []);
@@ -158,8 +158,32 @@ function gerarJogos() {
             }
         }
 
+       /* const jogosGeradosDiv = document.getElementById('jogosGerados');
+        jogosGeradosDiv.innerHTML = '<h2>Jogos Gerados:</h2>';*/
+
+        /*const jogosGeradosDiv = document.getElementById('jogosGerados');
+        jogosGeradosDiv.innerHTML = `<h2>Jogos Gerados: <span style="color: red; font-weight: bold;">${quantidadeJogos}</span></h2>`;
+        */
+
+        /*
         const jogosGeradosDiv = document.getElementById('jogosGerados');
-        jogosGeradosDiv.innerHTML = '<h2>Jogos Gerados:</h2>';
+        jogosGeradosDiv.innerHTML = `<h2>Jogos Gerados: <span style="color: red; font-weight: bold;">${quantidadeJogos}</span> com <span style="color: red; font-weight: bold;">${6 + dezenasAdicionais}</span> dezenas</h2>`;
+        */
+
+        //Mostra a quantidade de jogos e as quantidade de dezenas
+        const jogosGeradosDiv = document.getElementById('jogosGerados');
+        const quantidadeDezenas = 6 + dezenasAdicionais;
+        
+        const textoJogos = quantidadeJogos === 1 ? 'Jogo Gerado' : 'Jogos Gerados';
+        const textoDezenas = quantidadeDezenas === 1 ? 'dezenas' : 'dezenas';
+        
+        jogosGeradosDiv.innerHTML = `<h2>${textoJogos}: <span style="color: red; font-weight: bold;">${quantidadeJogos}</span> com <span style="color: red; font-weight: bold;">${quantidadeDezenas}</span> ${textoDezenas}</h2>`;
+        
+
+
+
+
+
 
         jogos.forEach((item, index) => {
             const jogo = item.jogo;
@@ -186,112 +210,14 @@ function gerarJogos() {
         mensagemSucesso.style.border = '1px solid #d0e9c6';
         mensagemSucesso.style.borderRadius = '5px';
         mensagemSucesso.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
-        mensagemSucesso.style.fontFamily = 'Arial, sans-serif';
-        mensagemSucesso.style.fontSize = '18px';
-        mensagemSucesso.style.textAlign = 'center';
-        
+        mensagemSucesso.style.zIndex = '1000';
         document.body.appendChild(mensagemSucesso);
 
         setTimeout(() => {
-            document.body.removeChild(mensagemSucesso);
-        }, 3000);
+            mensagemSucesso.remove();
+        }, 3000); // Remove a mensagem após 3 segundos
 
     } catch (error) {
-        console.error('Erro ao gerar os jogos:', error.message);
+        alert("Erro ao gerar jogos: " + error.message);
     }
-}
-
-
-
-
-//ESTE
-function resetarJogo() {
-    // Limpa os campos de entrada
-    document.getElementById('excluir-pares').value = '';
-    document.getElementById('excluir-impares').value = '';
-    document.getElementById('fixar').value = '';
-    document.getElementById('jogos').value = '';
-    document.getElementById('dezenas-adicionais').value = '';
-
-    // Limpa a área de mensagens de erro
-    document.getElementById('erro-pares').textContent = '';
-    document.getElementById('erro-impares').textContent = '';
-    document.getElementById('erro-fixar').textContent = '';
-    document.getElementById('erro-jogos').textContent = '';
-    document.getElementById('erro-dezenas-adicionais').textContent = '';
-
-    // Limpa a área de jogos gerados
-    document.getElementById('jogosGerados').innerHTML = '';
-
-    // Limpa a mensagem de sucesso
-    document.getElementById('mensagemSucesso').innerHTML = '';
-}
-
-function validarDezenas() {
-    var input = document.getElementById("dezenas-adicionais");
-    var erroDiv = document.getElementById("erro-dezenas-adicionais");
-    var valor = input.value;
-    
-    if (valor < 7 || valor > 14 || isNaN(valor)) {
-        // Exibir mensagem de erro
-        erroDiv.style.display = "block";
-    } else {
-        // Ocultar mensagem de erro
-        erroDiv.style.display = "none";
-    }
-}
-
-
-//ESTE
-function salvarJogo() {
-    const jogosGeradosDiv = document.getElementById('jogosGerados');
-    const jogos = Array.from(jogosGeradosDiv.querySelectorAll('p')).map(p => {
-        const texto = p.textContent || p.innerText;
-        // Extrai apenas os números do texto do jogo
-        return texto.match(/\d{2}/g).join(' ');
-    });
-
-    if (jogos.length === 0) {
-        alert("Nenhum jogo gerado para salvar.");
-        return;
-    }
-
-    // Cria o conteúdo do arquivo
-    const conteudo = jogos.join('\n');
-    const blob = new Blob([conteudo], { type: 'text/plain;charset=utf-8' });
-    
-    // Cria um link de download e aciona o download
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'jogos_megasena.txt';
-    a.click();
-    URL.revokeObjectURL(url);
-}
-
-
-//ESTE
-function exportarParaExcel() {
-    const jogosGeradosDiv = document.getElementById('jogosGerados');
-    const jogos = Array.from(jogosGeradosDiv.querySelectorAll('p')).map(p => {
-        const texto = p.textContent || p.innerText;
-        // Extrai apenas os números do texto do jogo
-        return texto.match(/\d{2}/g).join(', ');
-    });
-
-    if (jogos.length === 0) {
-        alert("Nenhum jogo gerado para exportar.");
-        return;
-    }
-
-    // Cria uma planilha de dados
-    const wb = XLSX.utils.book_new();
-    const wsData = jogos.map(jogo => jogo.split(', '));
-    
-    // Adiciona uma aba com os dados
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    XLSX.utils.book_append_sheet(wb, ws, "Jogos Mega-Sena");
-
-    // Gera o arquivo Excel
-    XLSX.writeFile(wb, 'jogos_megasena.xlsx');
 }
