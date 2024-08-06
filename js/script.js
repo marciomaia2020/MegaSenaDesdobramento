@@ -221,3 +221,97 @@ function gerarJogos() {
         alert("Erro ao gerar jogos: " + error.message);
     }
 }
+
+
+
+//ESTE
+function resetarJogo() {
+    // Limpa os campos de entrada
+    document.getElementById('excluir-pares').value = '';
+    document.getElementById('excluir-impares').value = '';
+    document.getElementById('fixar').value = '';
+    document.getElementById('jogos').value = '';
+    document.getElementById('dezenas-adicionais').value = '';
+
+    // Limpa a área de mensagens de erro
+    document.getElementById('erro-pares').textContent = '';
+    document.getElementById('erro-impares').textContent = '';
+    document.getElementById('erro-fixar').textContent = '';
+    document.getElementById('erro-jogos').textContent = '';
+    document.getElementById('erro-dezenas-adicionais').textContent = '';
+
+    // Limpa a área de jogos gerados
+    document.getElementById('jogosGerados').innerHTML = '';
+
+    // Limpa a mensagem de sucesso
+    document.getElementById('mensagemSucesso').innerHTML = '';
+}
+
+function validarDezenas() {
+    var input = document.getElementById("dezenas-adicionais");
+    var erroDiv = document.getElementById("erro-dezenas-adicionais");
+    var valor = input.value;
+    
+    if (valor < 7 || valor > 14 || isNaN(valor)) {
+        // Exibir mensagem de erro
+        erroDiv.style.display = "block";
+    } else {
+        // Ocultar mensagem de erro
+        erroDiv.style.display = "none";
+    }
+}
+
+
+//ESTE
+function salvarJogo() {
+    const jogosGeradosDiv = document.getElementById('jogosGerados');
+    const jogos = Array.from(jogosGeradosDiv.querySelectorAll('p')).map(p => {
+        const texto = p.textContent || p.innerText;
+        // Extrai apenas os números do texto do jogo
+        return texto.match(/\d{2}/g).join(' ');
+    });
+
+    if (jogos.length === 0) {
+        alert("Nenhum jogo gerado para salvar.");
+        return;
+    }
+
+    // Cria o conteúdo do arquivo
+    const conteudo = jogos.join('\n');
+    const blob = new Blob([conteudo], { type: 'text/plain;charset=utf-8' });
+    
+    // Cria um link de download e aciona o download
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'jogos_megasena.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+
+//ESTE
+function exportarParaExcel() {
+    const jogosGeradosDiv = document.getElementById('jogosGerados');
+    const jogos = Array.from(jogosGeradosDiv.querySelectorAll('p')).map(p => {
+        const texto = p.textContent || p.innerText;
+        // Extrai apenas os números do texto do jogo
+        return texto.match(/\d{2}/g).join(', ');
+    });
+
+    if (jogos.length === 0) {
+        alert("Nenhum jogo gerado para exportar.");
+        return;
+    }
+
+    // Cria uma planilha de dados
+    const wb = XLSX.utils.book_new();
+    const wsData = jogos.map(jogo => jogo.split(', '));
+    
+    // Adiciona uma aba com os dados
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    XLSX.utils.book_append_sheet(wb, ws, "Jogos Mega-Sena");
+
+    // Gera o arquivo Excel
+    XLSX.writeFile(wb, 'jogos_megasena.xlsx');
+}
