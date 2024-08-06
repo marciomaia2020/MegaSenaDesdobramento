@@ -193,3 +193,32 @@ function gerarJogos() {
         console.error("Erro na validação dos campos:", error);
     }
 }
+
+//ESTE
+function validarFixar() {
+    const fixarInput = document.getElementById('fixar');
+    const erroFixar = document.getElementById('erro-fixar');
+    const fixar = Number(fixarInput.value.trim());
+
+    // Obtém os números pares e ímpares a serem excluídos
+    const excluirPares = validarCampo('excluir-pares', 'pares');
+    const excluirImpares = validarCampo('excluir-impares', 'impares');
+
+    // Verifica se a dezena fixa é válida
+    if (isNaN(fixar) || fixar < 1 || fixar > 60) {
+        erroFixar.textContent = "A dezena fixa deve estar entre 1 e 60.";
+        return null;
+    } else if (excluirPares.includes(fixar)) {
+        erroFixar.textContent = "A dezena fixa não pode ser um número par excluído.";
+        return null;
+    } else if (excluirImpares.includes(fixar)) {
+        erroFixar.textContent = "A dezena fixa não pode ser um número ímpar excluído.";
+        return null;
+    } else {
+        erroFixar.textContent = '';
+        return fixar;
+    }
+}
+
+
+
