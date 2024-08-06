@@ -86,46 +86,53 @@ document.getElementById('excluir-impares').addEventListener('input', () => valid
 document.getElementById('fixar').addEventListener('input', validarFixar);
 document.getElementById('jogos').addEventListener('input', validarJogos);
 
-function gerarJogos() {
-    // Função para validar e obter valores dos campos
-    function obterValor(id) {
-        const valor = document.getElementById(id).value.trim();
-        const numero = Number(valor);
-        if (isNaN(numero) || numero <= 0 || numero > 1000) {
-            alert(`O valor em ${id} deve ser um número entre 1 e 1000.`);
-            throw new Error(`Valor inválido em ${id}`);
-        }
-        return numero;
-    }
 
-    // Obtém os valores dos campos e faz a validação
+
+// INICIO - Função para validar a quantidade de dezenas adicionais
+function validarDezenasAdicionais() {
+    const dezenasAdicionaisInput = document.getElementById('dezenas-adicionais');
+    const erroDezenasAdicionais = document.getElementById('erro-dezenas-adicionais');
+    const dezenasAdicionais = Number(dezenasAdicionaisInput.value.trim());
+
+    if (dezenasAdicionais < 7 || dezenasAdicionais > 20) {
+        erroDezenasAdicionais.textContent = "O número de dezenas adicionais deve estar entre 7 e 20.";
+        return null;
+    } else {
+        erroDezenasAdicionais.textContent = '';
+        return dezenasAdicionais;
+    }
+}
+document.getElementById('dezenas-adicionais').addEventListener('input', validarDezenasAdicionais);
+// FINAL - Função para validar a quantidade de dezenas adicionais
+
+
+// Atualize a função gerarJogos para incluir a validação das dezenas adicionais
+function gerarJogos() {
     try {
         const fixar = validarFixar();
         if (fixar === null) return; // Interrompe a execução se a validação da dezena fixa falhar
 
-        const quantidadeJogos = obterValor('jogos');
-        const dezenasAdicionais = Number(document.getElementById('dezenas-adicionais').value.trim());
+        const quantidadeJogos = Number(document.getElementById('jogos').value.trim());
+        const dezenasAdicionais = validarDezenasAdicionais();
 
         if (quantidadeJogos <= 0 || quantidadeJogos > 1000) {
             alert("Quantidade de jogos inválida. Deve ser entre 1 e 1000.");
             return;
         }
-        
-        if (dezenasAdicionais < 0 || dezenasAdicionais > 5) {
-            alert("Número de dezenas adicionais deve ser entre 0 e 5.");
+
+        if (dezenasAdicionais === null) {
+            // Interrompe a execução se a validação das dezenas adicionais falhar
             return;
         }
 
         const excluirPares = (document.getElementById('excluir-pares').value.trim().split(',').map(Number) || []);
         const excluirImpares = (document.getElementById('excluir-impares').value.trim().split(',').map(Number) || []);
         
-        // Verifica se os números fixos e adicionais estão dentro do intervalo
         if (fixar < 1 || fixar > 60) {
             alert("Número fixado inválido. Deve ser entre 1 e 60.");
             return;
         }
 
-        // Cria uma lista de números disponíveis para o jogo
         const numerosDisponiveis = Array.from({ length: 60 }, (_, i) => i + 1)
             .filter(num => !excluirPares.includes(num) && !excluirImpares.includes(num) && num !== fixar);
 
@@ -157,7 +164,6 @@ function gerarJogos() {
             
             jogo.sort((a, b) => a - b);
 
-            // Evita jogos duplicados
             if (!jogos.some(existingJogo => existingJogo.jogo.join() === jogo.join())) {
                 jogos.push({ jogo, adicionais });
             }
@@ -173,10 +179,8 @@ function gerarJogos() {
             const jogoElement = document.createElement('p');
             jogoElement.innerHTML = `Jogo ${index + 1}: ${jogo.map(num => {
                 if (num === fixar) {
-                    // Destaca a dezena fixada com uma cor diferente
                     return `<span style="color: red; font-weight: bold; font-family: Arial, sans-serif;">${num.toString().padStart(2, '0')}</span>`;
                 } else if (adicionais.includes(num)) {
-                    // Destaca as dezenas adicionais com uma cor diferente
                     return `<span style="color: blue; font-weight: bold; font-family: Arial, sans-serif;">${num.toString().padStart(2, '0')}</span>`;
                 } else {
                     return `<span style="font-family: Courier New, monospace;">${num.toString().padStart(2, '0')}</span>`;
@@ -185,7 +189,6 @@ function gerarJogos() {
             jogosGeradosDiv.appendChild(jogoElement);
         });
 
-        // Cria e exibe a mensagem de sucesso
         const mensagemSucesso = document.createElement('div');
         mensagemSucesso.innerHTML = `<span style="color: red; font-weight: bold;">${quantidadeJogos}</span> Jogo${quantidadeJogos > 1 ? 's' : ''} gerado${quantidadeJogos > 1 ? 's' : ''} com sucesso!`;
         mensagemSucesso.style.position = 'fixed';
@@ -215,7 +218,6 @@ function gerarJogos() {
 document.getElementById('gerar').addEventListener('click', gerarJogos);
 
 
-
 //ESTE
 function resetarJogo() {
     // Limpa os campos de entrada
@@ -230,6 +232,7 @@ function resetarJogo() {
     document.getElementById('erro-impares').textContent = '';
     document.getElementById('erro-fixar').textContent = '';
     document.getElementById('erro-jogos').textContent = '';
+    document.getElementById('erro-dezenas-adicionais').textContent = '';
 
     // Limpa a área de jogos gerados
     document.getElementById('jogosGerados').innerHTML = '';
@@ -238,7 +241,19 @@ function resetarJogo() {
     document.getElementById('mensagemSucesso').innerHTML = '';
 }
 
-
+function validarDezenas() {
+    var input = document.getElementById("dezenas-adicionais");
+    var erroDiv = document.getElementById("erro-dezenas-adicionais");
+    var valor = input.value;
+    
+    if (valor < 7 || valor > 20 || isNaN(valor)) {
+        // Exibir mensagem de erro
+        erroDiv.style.display = "block";
+    } else {
+        // Ocultar mensagem de erro
+        erroDiv.style.display = "none";
+    }
+}
 
 
 //ESTE
