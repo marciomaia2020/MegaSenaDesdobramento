@@ -18,9 +18,15 @@ document.addEventListener("DOMContentLoaded", () => {
 function validarNumeros(numArray, tipo) {
     const numCount = numArray.length;
     const tipoCorreto = tipo === 'pares' ? numArray.every(num => num % 2 === 0) : numArray.every(num => num % 2 !== 0);
-    
+    const dentroDoLimite = numArray.every(num => num >= 1 && num <= 60);
+    const formatoCorreto = numArray.every(num => num.toString().length <= 2);
+
     if (numCount !== 10) {
         return `Você deve inserir exatamente 10 números ${tipo}.`;
+    } else if (!dentroDoLimite) {
+        return `Todos os números devem estar entre 1 e 60.`;
+    } else if (!formatoCorreto) {
+        return `Todos os números devem ter 1 ou 2 dígitos.`;
     } else if (!tipoCorreto) {
         return `Todos os números no campo ${tipo} devem ser ${tipo}.`;
     } else {
@@ -40,9 +46,40 @@ function validarCampo(inputId, tipo) {
     } else {
         erroElemento.textContent = '';
     }
-    
     return numeros;
 }
+
+
+/*
+function validarNumeros(numArray, tipo) {
+    const numCount = numArray.length;
+    const tipoCorreto = tipo === 'pares' ? numArray.every(num => num % 2 === 0) : numArray.every(num => num % 2 !== 0);
+    
+    if (numCount !== 10) {
+        return `Você deve inserir exatamente 10 números ${tipo}.`;
+    } else if (!tipoCorreto) {
+        return `Todos os números no campo ${tipo} devem ser ${tipo}.`;
+    } else {
+        return null;
+    }
+}
+function validarCampo(inputId, tipo) {
+    const input = document.getElementById(inputId);
+    const erroElemento = document.getElementById(`erro-${tipo}`);
+    
+    const numeros = input.value.split(',').map(num => Number(num.trim())).filter(num => !isNaN(num));
+    const mensagemErro = validarNumeros(numeros, tipo);
+    
+    if (mensagemErro) {
+        erroElemento.textContent = mensagemErro;
+    } else {
+        erroElemento.textContent = '';
+    }
+    return numeros;
+}
+*/
+
+
 
 function validarFixar() {
     const fixarInput = document.getElementById('fixar');
@@ -87,8 +124,8 @@ function validarDezenasAdicionais() {
     const erroDezenasAdicionais = document.getElementById('erro-dezenas-adicionais');
     const dezenasAdicionais = Number(dezenasAdicionaisInput.value.trim());
 
-    if (dezenasAdicionais < 1 || dezenasAdicionais > 14) {
-        erroDezenasAdicionais.textContent = "O número de dezenas adicionais deve estar entre 1 e 14.";
+    if (dezenasAdicionais < 0 || dezenasAdicionais > 14) {
+        erroDezenasAdicionais.textContent = "O número de dezenas adicionais deve estar entre 0 e 14.";
         return null;
     } else {
         erroDezenasAdicionais.textContent = '';
@@ -109,8 +146,8 @@ function gerarJogos() {
 
         const dezenasAdicionais = validarDezenasAdicionais(); // Quantidade de dezenas adicionais escolhidas pelo usuário
 
-        if (dezenasAdicionais === null || dezenasAdicionais < 1 || dezenasAdicionais > 14) {
-            alert("Número de dezenas adicionais inválido. Deve ser entre 1 e 14.");
+        if (dezenasAdicionais === null || dezenasAdicionais < 0 || dezenasAdicionais > 14) {
+            alert("Número de dezenas adicionais inválido. Deve ser entre 0 e 14.");
             return;
         }
 
@@ -158,32 +195,14 @@ function gerarJogos() {
             }
         }
 
-       /* const jogosGeradosDiv = document.getElementById('jogosGerados');
-        jogosGeradosDiv.innerHTML = '<h2>Jogos Gerados:</h2>';*/
-
-        /*const jogosGeradosDiv = document.getElementById('jogosGerados');
-        jogosGeradosDiv.innerHTML = `<h2>Jogos Gerados: <span style="color: red; font-weight: bold;">${quantidadeJogos}</span></h2>`;
-        */
-
-        /*
-        const jogosGeradosDiv = document.getElementById('jogosGerados');
-        jogosGeradosDiv.innerHTML = `<h2>Jogos Gerados: <span style="color: red; font-weight: bold;">${quantidadeJogos}</span> com <span style="color: red; font-weight: bold;">${6 + dezenasAdicionais}</span> dezenas</h2>`;
-        */
-
         //Mostra a quantidade de jogos e as quantidade de dezenas
         const jogosGeradosDiv = document.getElementById('jogosGerados');
         const quantidadeDezenas = 6 + dezenasAdicionais;
         
         const textoJogos = quantidadeJogos === 1 ? 'Jogo Gerado' : 'Jogos Gerados';
-        const textoDezenas = quantidadeDezenas === 1 ? 'dezenas' : 'dezenas';
+        const textoDezenas = quantidadeDezenas === 1 ? 'dezena' : 'dezenas';
         
         jogosGeradosDiv.innerHTML = `<h2>${textoJogos}: <span style="color: red; font-weight: bold;">${quantidadeJogos}</span> com <span style="color: red; font-weight: bold;">${quantidadeDezenas}</span> ${textoDezenas}</h2>`;
-        
-
-
-
-
-
 
         jogos.forEach((item, index) => {
             const jogo = item.jogo;
