@@ -30,24 +30,28 @@
             <p><strong>INSTRUÇÕES:</strong></p>
             <ol>
                 <li>Selecione <strong><i>10 dezenas Pares</i></strong>.</li>
-                <li>Selecione <strong><i></i>10 dezenas Ímpares</i></strong>.</li>
-                <li>Escolha <strong><i></i>1 dezena</i></strong> para fixar.</li>
-                <li>Selecione a <strong><i></i>quantidade de jogos</i></strong> que deseja gerar.</li>
-                <li>Selecione <strong><i></i>quantas dezenas</i></strong> quer adicionar (<span style="color: red;">opcional</span>).</li>
-                <li>Salve o jogo para abrir no<strong><i> Bloco de Nota</i></strong> ou exporte para o<strong><i> Excel</i></strong>.</li>
+                <li>Selecione <strong><i>10 dezenas Ímpares</i></strong>.</li>
+                <li>Selecione <strong><i>1 dezena</i></strong> para fixar.</li>
+                <li>Selecione a <strong><i>quantidade de jogos</i></strong> a ser gerado. (1.000)</li>
+                <li>Selecione <strong><i>quantas dezenas</i></strong> quer adicionar (<span style="color: red;">opcional</span>).</li>
+                <li><strong>Salve</strong> o jogo para abrir no Bloco de Notas, "*.txt" ou exportar para o Excel *.xlxs".</li>
             </ol>
+            <ul>
+                <li>Obs: Para gerar 1.000 jogos o sistema levará menos que 3 segundos.</li>
+                <li>Obs: Se seu navegador travar, use outro como alternativa. Recomendado "Mozzila Firefox".</li>
+            </ul>
         </div>
 
 
 
         <div class="number-selection">
             <label for="excluir-pares">1 - Dezenas pares a excluir:</label>
-            <input type="text" id="excluir-pares" placeholder="Digite dezenas Pares separadas por vírgula">
+            <input type="text" id="excluir-pares" placeholder="Digite 10 dezenas pares separadas por vírgula">
             <div id="erro-pares" class="erro"></div>
         </div>
         <div class="number-selection">
             <label for="excluir-impares">2 - Dezenas ímpares a excluir:</label>
-            <input type="text" id="excluir-impares" placeholder="Digite dezenas Ímpares separadas por vírgula">
+            <input type="text" id="excluir-impares" placeholder="Digite 10 dezenas ímpares separadas por vírgula">
             <div id="erro-impares" class="erro"></div>
         </div>
         <div class="number-selection">
@@ -56,8 +60,8 @@
             <div id="erro-fixar" class="erro"></div>
         </div>
         <div class="number-selection">
-            <label for="jogos">4 - Quantidade de jogos: (<small><span style="color: red;">Até 15000 - Aguarde!!!</span></small>)</label>
-            <input type="number" id="jogos" min="1" max="15000" placeholder="Ex: 5">
+            <label for="jogos">4 - Quantidade de jogos: (<small><span style="color: red;">Até 1000</span></small>)</label>
+            <input type="number" id="jogos" min="1" max="1000" placeholder="Ex: 5">
             <div id="erro-jogos" class="erro"></div>
         </div>
         <div class="number-selection">
@@ -75,7 +79,7 @@
         <div class="userInformation">
             <p>Os jogos serão gerados com no mínimo 6 dezenas. Caso não haja adição de dezenas (<span style="color: red;">opcional</span>).</p>
             <p>Os jogos gerados são checados automaticamente afim de não haver duplicidade.</p>
-            <p>O limite para a geração de jogos está setada para 15.000.</p>
+            <p>O limite para a geração de jogos está setada para 1.000.</p>
         </div>
 
         <!-- Elemento HTML onde deseja que a mensagem seja exibida -->

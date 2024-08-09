@@ -12,15 +12,14 @@ body {
 }
 
 .container {
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
     padding: 20px;
-    max-width: 800px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 100%;
-    margin: 20px;
-    box-sizing: border-box;
-}
+    max-width: 900px; /* Aumentado o tamanho máximo do container */
+    box-sizing: border-box; /* Inclui o padding na largura total */
+  }
 
 h1, h3 {
     text-align: center;
