@@ -111,8 +111,8 @@ function validarJogos() {
     const erroJogos = document.getElementById('erro-jogos');
     const jogos = Number(jogosInput.value.trim());
     
-    if (jogos <= 0 || jogos > 1000) {
-        erroJogos.textContent = "A quantidade de jogos deve ser entre 1 e 1000.";
+    if (jogos <= 0 || jogos > 5000) {
+        erroJogos.textContent = "A quantidade de jogos deve ser entre 1 e 5000.";
     } else {
         erroJogos.textContent = '';
     }
@@ -229,7 +229,7 @@ function gerarJogos() {
         mensagemSucesso.style.border = '1px solid #d0e9c6';
         mensagemSucesso.style.borderRadius = '5px';
         mensagemSucesso.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
-        mensagemSucesso.style.zIndex = '1000';
+        mensagemSucesso.style.zIndex = '5000';
         document.body.appendChild(mensagemSucesso);
 
         setTimeout(() => {
