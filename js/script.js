@@ -107,36 +107,25 @@ document.getElementById('fixar').addEventListener('input', validarFixar);
 document.getElementById('jogos').addEventListener('input', validarJogos);
 document.getElementById('dezenas-adicionais').addEventListener('input', validarDezenasAdicionais);
 
-function gerarJogos() {
+async function gerarJogos() {
     try {
         const fixar = validarFixar();
-        if (fixar === null) return; // Interrompe a execução se a validação da dezena fixa falhar
+        if (fixar === null) return;
 
-        const dezenasAdicionais = validarDezenasAdicionais(); // Quantidade de dezenas adicionais escolhidas pelo usuário
-
+        const dezenasAdicionais = validarDezenasAdicionais();
         if (dezenasAdicionais === null || dezenasAdicionais < 0 || dezenasAdicionais > 14) {
             alert("Número de dezenas adicionais inválido. Deve ser entre 0 e 14.");
             return;
         }
 
-        const quantidadeJogos = validarJogos(); // Obtém a quantidade total de jogos
-
-        if (quantidadeJogos === 0) return; // Interrompe a execução se a validação da quantidade de jogos falhar
+        const quantidadeJogos = validarJogos();
+        if (quantidadeJogos === 0) return;
 
         const excluirPares = (document.getElementById('excluir-pares').value.trim().split(',').map(Number) || []);
         const excluirImpares = (document.getElementById('excluir-impares').value.trim().split(',').map(Number) || []);
 
-        if (fixar < 1 || fixar > 60) {
-            alert("Número fixado inválido. Deve ser entre 1 e 60.");
-            return;
-        }
-
-        // Números disponíveis excluindo pares, ímpares e o número fixo
         let numerosDisponiveis = Array.from({ length: 60 }, (_, i) => i + 1)
             .filter(num => !excluirPares.includes(num) && !excluirImpares.includes(num) && num !== fixar);
-            //console.log(`Números disponíveis após exclusão: ${numerosDisponiveis}`);
-
-
 
         if (numerosDisponiveis.length < 6) {
             alert("Não há números suficientes para gerar jogos.");
@@ -144,31 +133,39 @@ function gerarJogos() {
         }
 
         const jogos = [];
+        const batchSize = 500; // Defina o tamanho do lote
+        const batches = Math.ceil(quantidadeJogos / batchSize);
 
-        for (let j = 0; j < quantidadeJogos; j++) {
-            let numerosAleatorios = [...numerosDisponiveis];
-            const jogo = [fixar];
+        for (let batch = 0; batch < batches; batch++) {
+            const jogosBatch = await Promise.all(
+                Array.from({ length: Math.min(batchSize, quantidadeJogos - batch * batchSize) }).map(() => {
+                    return new Promise((resolve) => {
+                        let numerosAleatorios = [...numerosDisponiveis];
+                        const jogo = [fixar];
+                        
+                        while (jogo.length < 6 + dezenasAdicionais) {
+                            if (numerosAleatorios.length === 0) break;
+                            const index = Math.floor(Math.random() * numerosAleatorios.length);
+                            const numero = numerosAleatorios.splice(index, 1)[0];
+                            jogo.push(numero);
+                        }
 
-            // Preenche o restante do jogo com números aleatórios, totalizando o número de dezenas adicionais
-            while (jogo.length < 6 + dezenasAdicionais) {
-                if (numerosAleatorios.length === 0) break;
-                const index = Math.floor(Math.random() * numerosAleatorios.length);
-                const numero = numerosAleatorios.splice(index, 1)[0];
-                jogo.push(numero);
-            }
+                        jogo.sort((a, b) => a - b);
 
-            //console.log(`Jogo ${j + 1}: ${jogo}`); // Depuração
+                        if (!jogos.some(existingJogo => existingJogo.jogo.join() === jogo.join())) {
+                            resolve({ jogo });
+                        } else {
+                            resolve(null);
+                        }
+                    });
+                })
+            );
 
-            // Ordena os números
-            jogo.sort((a, b) => a - b);
-
-            // Evita duplicatas
-            if (!jogos.some(existingJogo => existingJogo.jogo.join() === jogo.join())) {
-                jogos.push({ jogo });
-            }
+            jogosBatch.forEach(jogo => {
+                if (jogo) jogos.push(jogo);
+            });
         }
 
-        // Mostra a quantidade de jogos e a quantidade de dezenas
         const jogosGeradosDiv = document.getElementById('jogosGerados');
         const quantidadeDezenas = 6 + dezenasAdicionais;
 
@@ -178,7 +175,6 @@ function gerarJogos() {
         jogosGeradosDiv.innerHTML = `<h2>${textoJogos}: <span style="color: red; font-weight: bold;">${quantidadeJogos}</span> com <span style="color: red; font-weight: bold;">${quantidadeDezenas}</span> ${textoDezenas}</h2>`;
 
         jogos.forEach((item, index) => {
-            //console.log(`Jogo ${index + 1}: ${item.jogo}`);
             const jogo = item.jogo;
 
             const jogoElement = document.createElement('p');
@@ -192,7 +188,6 @@ function gerarJogos() {
             jogosGeradosDiv.appendChild(jogoElement);
         });
 
-        // Mostra uma mensagem de sucesso
         const mensagemSucesso = document.createElement('div');
         mensagemSucesso.innerHTML = `<span style="color: red; font-weight: bold;">${quantidadeJogos}</span> Jogo${quantidadeJogos > 1 ? 's' : ''} gerado${quantidadeJogos > 1 ? 's' : ''} com sucesso!`;
         mensagemSucesso.style.position = 'fixed';
@@ -215,6 +210,8 @@ function gerarJogos() {
         alert("Erro ao gerar jogos: " + error.message);
     }
 }
+
+document.getElementById('gerar-jogos').addEventListener('click', gerarJogos);
 
 
 //ESTE
