@@ -13,12 +13,13 @@ body {
     /*height: 100vh;*/
     overflow-y: auto;
     margin-top: 25px;
+    line-height: 1.6;
 }
 
 .container {
     background-color: #fff;
     padding: 20px;
-   border-radius: 8px;
+    border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 900px; /* Aumentado o tamanho máximo do container */
@@ -59,6 +60,7 @@ body {
     margin-bottom: 20px;
     font-size: 13px;
     color: gray;
+    line-height: 1.7;
 }
 
 .input-container {
@@ -77,7 +79,6 @@ body {
     border: 1px solid #ccc;
    border-radius: 5px;
 }
-
 .button-container {
     display: flex;
     justify-content: space-between;
@@ -90,7 +91,7 @@ button {
     border-radius: 5px;
     cursor: pointer;
     background-color: #A9CF46;
-    color: white;
+    color: black;
     font-size: 14px;
     transition: background-color 0.3s;
 }
@@ -125,7 +126,11 @@ button:hover {
     color: red;
     font-size: 12px;
 }
-
+input::placeholder {
+    color: #A9CF46;
+    font-style: italic;
+    font-size: 12px;
+}
 /* AJUSTES ESPECIAIS PARA NÃO TER PROBLEMA COM A VISUALIZAÇÃO*/
 
 /*1. Flexbox e Grid Layout

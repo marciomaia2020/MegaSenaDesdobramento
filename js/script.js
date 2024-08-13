@@ -79,8 +79,8 @@ function validarJogos() {
     const erroJogos = document.getElementById('erro-jogos');
     const jogos = Number(jogosInput.value.trim());
     
-    if (jogos <= 0 || jogos > 5000) {
-        erroJogos.textContent = "A quantidade de jogos deve ser entre 1 e 5000.";
+    if (jogos <= 0 || jogos > 4000) {
+        erroJogos.textContent = "A quantidade de jogos deve ser entre 1 e 4000.";
     } else {
         erroJogos.textContent = '';
     }
@@ -174,6 +174,7 @@ async function gerarJogos() {
 
         jogosGeradosDiv.innerHTML = `<h2>${textoJogos}: <span style="color: red; font-weight: bold;">${quantidadeJogos}</span> com <span style="color: red; font-weight: bold;">${quantidadeDezenas}</span> ${textoDezenas}</h2>`;
 
+/*ANTES
         jogos.forEach((item, index) => {
             const jogo = item.jogo;
 
@@ -188,6 +189,23 @@ async function gerarJogos() {
             jogosGeradosDiv.appendChild(jogoElement);
         });
 
+*/
+/*DEPOIS*/
+jogos.forEach((item, index) => {
+    const jogo = item.jogo;
+
+    const jogoElement = document.createElement('p');
+    jogoElement.innerHTML = `Jogo ${index + 1}: ${jogo.map(num => {
+        if (num === fixar) {
+            return `<span style="color: red; font-weight: bold; font-family: Arial, sans-serif;">${num.toString().padStart(2, '0')}</span>`;
+        } else {
+            return `<span style="font-family: Courier New, monospace; color: #333;">${num.toString().padStart(2, '0')}</span>`;
+        }
+    }).join(', ')}`;
+    jogosGeradosDiv.appendChild(jogoElement);
+});
+
+
         const mensagemSucesso = document.createElement('div');
         mensagemSucesso.innerHTML = `<span style="color: red; font-weight: bold;">${quantidadeJogos}</span> Jogo${quantidadeJogos > 1 ? 's' : ''} gerado${quantidadeJogos > 1 ? 's' : ''} com sucesso!`;
         mensagemSucesso.style.position = 'fixed';
@@ -199,7 +217,7 @@ async function gerarJogos() {
         mensagemSucesso.style.border = '1px solid #d0e9c6';
         mensagemSucesso.style.borderRadius = '5px';
         mensagemSucesso.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
-        mensagemSucesso.style.zIndex = '5000';
+        mensagemSucesso.style.zIndex = '4000';
         document.body.appendChild(mensagemSucesso);
 
         setTimeout(() => {
