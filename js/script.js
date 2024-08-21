@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const numerosTable = document.getElementById('numeros').getElementsByTagName('tr')[0];
-
+    
     // Preenche a tabela com números de 01 a 60
     for (let i = 1; i <= 60; i++) {
         const td = document.createElement('td');
@@ -37,10 +37,10 @@ function validarNumeros(numArray, tipo) {
 function validarCampo(inputId, tipo) {
     const input = document.getElementById(inputId);
     const erroElemento = document.getElementById(`erro-${tipo}`);
-
+    
     const numeros = input.value.split(',').map(num => Number(num.trim())).filter(num => !isNaN(num));
     const mensagemErro = validarNumeros(numeros, tipo);
-
+    
     if (mensagemErro) {
         erroElemento.textContent = mensagemErro;
     } else {
@@ -54,9 +54,11 @@ function validarFixar() {
     const erroFixar = document.getElementById('erro-fixar');
     const fixar = Number(fixarInput.value.trim());
 
+    // Obtém os números pares e ímpares a serem excluídos
     const excluirPares = validarCampo('excluir-pares', 'pares');
     const excluirImpares = validarCampo('excluir-impares', 'impares');
 
+    // Verifica se a dezena fixa é válida
     if (isNaN(fixar) || fixar < 1 || fixar > 60) {
         erroFixar.textContent = "A dezena fixa deve estar entre 1 e 60.";
         return null;
@@ -76,7 +78,7 @@ function validarJogos() {
     const jogosInput = document.getElementById('jogos');
     const erroJogos = document.getElementById('erro-jogos');
     const jogos = Number(jogosInput.value.trim());
-
+    
     if (jogos <= 0 || jogos > 4000) {
         erroJogos.textContent = "A quantidade de jogos deve ser entre 1 e 4000.";
     } else {
@@ -140,7 +142,7 @@ async function gerarJogos() {
                     return new Promise((resolve) => {
                         let numerosAleatorios = [...numerosDisponiveis];
                         const jogo = [fixar];
-
+                        
                         while (jogo.length < 6 + dezenasAdicionais) {
                             if (numerosAleatorios.length === 0) break;
                             const index = Math.floor(Math.random() * numerosAleatorios.length);
@@ -150,8 +152,8 @@ async function gerarJogos() {
 
                         jogo.sort((a, b) => a - b);
 
-                        if (!jogos.some(existingJogo => existingJogo.jogo.join() === jogo.join())) {
-                            resolve({ jogo });
+                        if (!jogos.some(existingJogo => existingJogo.join() === jogo.join())) {
+                            resolve(jogo);
                         } else {
                             resolve(null);
                         }
@@ -172,61 +174,148 @@ async function gerarJogos() {
 
         jogosGeradosDiv.innerHTML = `<h2>${textoJogos}: <span style="color: red; font-weight: bold;">${quantidadeJogos}</span> com <span style="color: red; font-weight: bold;">${quantidadeDezenas}</span> ${textoDezenas}</h2>`;
 
-        jogos.forEach((item, index) => {
-            const jogo = item.jogo;
-
+        jogos.forEach(jogo => {
             const jogoElement = document.createElement('p');
-            jogoElement.innerHTML = `Jogo ${index + 1}: ${jogo.map(num => {
+            jogoElement.innerHTML = jogo.map(num => {
                 if (num === fixar) {
                     return `<span style="color: red; font-weight: bold; font-family: Arial, sans-serif;">${num.toString().padStart(2, '0')}</span>`;
                 } else {
                     return `<span style="font-family: Courier New, monospace; color: #333;">${num.toString().padStart(2, '0')}</span>`;
                 }
-            }).join(', ')}`;
+            }).join(', ');
             jogosGeradosDiv.appendChild(jogoElement);
         });
-
+/*
         const mensagemSucesso = document.createElement('div');
-        mensagemSucesso.innerHTML = `<span style="color: red; font-weight: bold;">${quantidadeJogos}</span> jogos foram gerados com sucesso!`;
-        jogosGeradosDiv.appendChild(mensagemSucesso);
+        mensagemSucesso.textContent = 'Jogos gerados com sucesso!';
+        mensagemSucesso.style.fontWeight = 'bold';
+        mensagemSucesso.style.color = 'green';
+        jogosGeradosDiv.insertBefore(mensagemSucesso, jogosGeradosDiv.firstChild);
+*/
+        const mensagemSucesso = document.createElement('div');
+        mensagemSucesso.innerHTML = `<span style="color: red; font-weight: bold;">${quantidadeJogos}</span> Jogo${quantidadeJogos > 1 ? 's' : ''} gerado${quantidadeJogos > 1 ? 's' : ''} com sucesso!`;
+        mensagemSucesso.style.position = 'fixed';
+        mensagemSucesso.style.top = '50%';
+        mensagemSucesso.style.left = '50%';
+        mensagemSucesso.style.transform = 'translate(-50%, -50%)';
+        mensagemSucesso.style.backgroundColor = '#dff0d8';
+        mensagemSucesso.style.padding = '20px';
+        mensagemSucesso.style.border = '1px solid #d0e9c6';
+        mensagemSucesso.style.borderRadius = '5px';
+        mensagemSucesso.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
+        mensagemSucesso.style.zIndex = '4000';
+        document.body.appendChild(mensagemSucesso);
 
-        return jogos.map(jogo => jogo.jogo.map(num => num.toString().padStart(2, '0')).join(', ')).join('\n');
+        setTimeout(() => {
+            mensagemSucesso.remove();
+        }, 3000);
+
+
+
+
     } catch (error) {
-        console.error('Erro ao gerar jogos:', error);
-        return null;
+        console.error("Erro ao gerar os jogos:", error);
     }
 }
 
-async function salvarJogo() {
-    const jogosGerados = await gerarJogos();
-    if (!jogosGerados) {
+document.getElementById('gerar').addEventListener('click', gerarJogos);
+
+
+/*
+function salvarJogo() {
+    const jogosGeradosDiv = document.getElementById('jogosGerados');
+
+    // Obtém todos os elementos de jogo
+    const jogos = Array.from(jogosGeradosDiv.querySelectorAll('p')).map(p => {
+        const texto = p.textContent || p.innerText;
+        
+        // Extrai apenas os números dos jogos
+        const numeros = texto.match(/\d{2}/g);
+        
+        // Verifica se encontrou números e os formata
+        if (numeros) {
+            return numeros.map(num => num.padStart(2, '0')).join(' ');
+        }
+        
+        return '';
+    }).filter(jogo => jogo.trim() !== ''); // Remove qualquer linha vazia ou apenas espaços
+
+    if (jogos.length === 0) {
+        alert("Nenhum jogo gerado para salvar.");
         return;
     }
 
-    const blob = new Blob([jogosGerados], { type: 'text/plain;charset=utf-8' });
+    // Cria o conteúdo do arquivo
+    const conteudo = jogos.join('\n');
+    const blob = new Blob([conteudo], { type: 'text/plain;charset=utf-8' });
+    //alert(`Conteúdo do arquivo TXT: ${conteudo}`);
+    console.log(`TXT: ${conteudo}`);
+
+
+    
+    // Cria um link de download e aciona o download
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'jogos_megasena.txt';
-    link.click();
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'jogos_megasena.txt';
+    a.click();
     URL.revokeObjectURL(url);
 }
+*/
 
-document.getElementById('gerarJogo').addEventListener('click', async () => {
-    await gerarJogos();
-});
+function salvarJogo() {
+    const jogosGeradosDiv = document.getElementById('jogosGerados');
 
-document.getElementById('salvarJogo').addEventListener('click', async () => {
-    await salvarJogo();
-});
+    // Obtém todos os elementos de jogo
+    const jogos = Array.from(jogosGeradosDiv.querySelectorAll('p')).map(p => {
+        const texto = p.textContent || p.innerText;
 
-/*
+        // Extrai apenas os números dos jogos
+        const numeros = texto.match(/\d{2}/g);
+
+        // Verifica se encontrou números e os formata
+        if (numeros) {
+            return numeros.map(num => num.padStart(2, '0')).join(' ');
+        }
+        return '';
+    }).filter(jogo => jogo !== '');
+
+    if (jogos.length === 0) {
+        alert('Nenhum jogo para salvar.');
+        return;
+    }
+
+
+    // Cria o conteúdo do arquivo
+    const conteudo = jogos.join('\n');
+    const blob = new Blob([conteudo], { type: 'text/plain' });
+    //alert(`Conteúdo do arquivo TXT: ${conteudo}`);
+    console.log(`TXT: ${conteudo}`);
+
+ 
+    // Cria um link para download
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'jogos_gerados.txt';
+    link.style.display = 'none';
+
+    document.body.appendChild(link);
+    link.click();
+
+    // Remove o link após o download
+    document.body.removeChild(link);
+}
+
+document.getElementById('salvar-jogo').addEventListener('click', salvarJogo);
+
+
+//ESTE
 function exportarParaExcel() {
     const jogosGeradosDiv = document.getElementById('jogosGerados');
     const jogos = Array.from(jogosGeradosDiv.querySelectorAll('p')).map(p => {
         const texto = p.textContent || p.innerText;
-        // Extrai apenas os números do texto do jogo e os retorna como array
-        return texto.match(/\d{2}/g);
+        // Extrai apenas os números do texto do jogo
+        return texto.match(/\d{2}/g).join(', ');
     });
 
     if (jogos.length === 0) {
@@ -236,7 +325,7 @@ function exportarParaExcel() {
 
     // Cria uma planilha de dados
     const wb = XLSX.utils.book_new();
-    const wsData = jogos;
+    const wsData = jogos.map(jogo => jogo.split(', '));
     
     // Adiciona uma aba com os dados
     const ws = XLSX.utils.aoa_to_sheet(wsData);
@@ -245,9 +334,8 @@ function exportarParaExcel() {
     // Gera o arquivo Excel
     XLSX.writeFile(wb, 'jogos_megasena.xlsx');
 }
-*/
 
-
+//ESTE
 function resetarJogo() {
     // Limpa os campos de entrada
     document.getElementById('excluir-pares').value = '';
@@ -284,3 +372,12 @@ function validarDezenas() {
     }
 }
 
+
+/*
+Curso Lógica de Programação Completo 2024 [Iniciantes] + Desafios + Muita prática
+https://www.youtube.com/watch?v=iF2MdbrTiBM&t=5668s&pp=ygUGcHl0aG9u
+
+Domine essas 10 Funções Obrigatórias em Python
+https://youtu.be/NB9pdUDNAJ4
+
+*/
